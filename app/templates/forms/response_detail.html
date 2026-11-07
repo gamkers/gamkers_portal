@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Response details · {{ form.title }}{% endblock %}
+{% block content %}
+<section class="workspace-wrap response-detail">
+  <a class="back-link" href="{{ url_for('forms.responses', form_id=form.id) }}">← All responses</a>
+  <p class="eyebrow">SUBMITTED {{ submission.submitted_at.strftime('%b %d, %Y · %H:%M') }} UTC</p><h1>{{ form.title }}</h1>
+  <div class="panel response-answer-list">
+    {% for key, value in submission.answers.items() %}<div class="answer-row"><span>{{ questions.get(key, 'Response') }}</span><strong>{{ value|join(', ') if value is iterable and value is not string else value }}</strong></div>{% endfor %}
+    <div class="answer-row"><span>Confirmation email</span><strong>{{ submission.email_status|replace('_',' ')|title }}</strong></div>
+  </div>
+</section>
+{% endblock %}

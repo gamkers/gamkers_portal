@@ -1,0 +1,44 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070907">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>{{ "You're registered" if mode == 'upcoming' else 'Thank you' }} · GAMKERS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/event.css') }}">
+</head>
+<body>
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+  </div>
+</nav>
+<div class="ev-page">
+  <div class="ev-done">
+    <span class="ev-done-icon">{{ ic('check') }}</span>
+    {% if mode == 'upcoming' %}
+      <p class="ev-done-kicker">You're registered</p>
+      <h1>See you at {{ event.title }}!</h1>
+    {% else %}
+      <p class="ev-done-kicker">Feedback received</p>
+      <h1>Thank you for sharing your experience.</h1>
+    {% endif %}
+    {% if mode == 'upcoming' and event.event_start_at %}
+      <p class="ev-done-when">{{ ic('calendar') }} {{ event.event_start_at.strftime('%A, %d %B %Y · %I:%M %p') }}{% if event.event_location %} · {{ event.event_location }}{% endif %}</p>
+    {% endif %}
+    {% if email_status == 'sent' %}<p class="ev-done-note">A confirmation email is on its way.</p>
+    {% elif email_status == 'failed' %}<p class="ev-done-note">Your response was saved, but we couldn't send the confirmation email.</p>
+    {% elif email_status == 'not_configured' and mode == 'upcoming' %}<p class="ev-done-note">Your registration is saved.</p>{% endif %}
+    <div class="ev-done-actions">
+      {% if calendar_url %}<a class="ev-register" href="{{ calendar_url }}" target="_blank" rel="noopener noreferrer">{{ ic('calendar') }} Add to Google Calendar</a>{% endif %}
+      <a class="ev-done-ghost" href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer">{{ ic('discord') }} Join the Gamkers Discord</a>
+      <a class="ev-done-ghost" href="{{ url_for('main.home') }}#events">{{ ic('arrow-left') }} Back to events</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

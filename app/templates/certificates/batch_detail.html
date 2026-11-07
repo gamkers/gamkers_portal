@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ batch.title }} · Certificates{% endblock %}
+{% block content %}
+<section class="workspace-wrap">
+  <a class="back-link" href="{{ url_for('certificates.index') }}">← Certificates</a>
+  <div class="editor-heading"><div><p class="eyebrow">CERTIFICATE BATCH</p><h1>{{ batch.title }}</h1><p class="muted">{{ batch.description }}</p></div>
+    <div class="export-actions"><a class="button button-outline button-small" href="{{ url_for('certificates.export_batch_csv', batch_id=batch.id) }}">Export CSV</a><a class="button button-primary button-small" href="{{ url_for('certificates.export_batch_xlsx', batch_id=batch.id) }}">Export Excel</a></div>
+  </div>
+  <div class="stat-grid certificate-stats">
+    <div class="stat-card"><span>GENERATED</span><strong>{{ batch.generated_records }}</strong><small>Permanent public certificate links</small></div>
+    <div class="stat-card"><span>FAILED</span><strong>{{ batch.failed_records }}</strong><small>Check the failed status below</small></div>
+    <div class="stat-card"><span>CREATED</span><strong>{{ batch.created_at.strftime('%b %d') }}</strong><small>{{ batch.created_at.strftime('%Y') }}</small></div>
+  </div>
+  {% if certificates %}
+    <div class="table-wrap"><table><thead><tr><th>Recipient</th><th>Institution</th><th>Certificate number</th><th>Status</th><th>Email delivery</th><th>Public link</th></tr></thead><tbody>
+      {% for certificate in certificates %}
+        <tr><td>{{ certificate.recipient_name }}</td><td>{{ certificate.college_name }}</td><td>{{ certificate.certificate_number }}</td><td><span class="badge {{ 'badge-live' if certificate.status == 'generated' else 'badge-draft' }}">{{ certificate.status|title }}</span></td><td><span class="badge {{ 'badge-live' if certificate.notification_status == 'sent' else 'badge-draft' }}">{{ certificate.notification_status|replace('_',' ')|title }}</span></td><td>{% if certificate.status == 'generated' %}<a href="{{ url_for('certificates.public_certificate', token=certificate.public_token) }}">View ↗</a>{% else %}—{% endif %}</td></tr>
+      {% endfor %}
+    </tbody></table></div>
+  {% else %}<div class="empty-state"><h3>No certificates in this batch.</h3></div>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+# Python runtime and environments
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+myenv/
+
+# Flask and local data
+instance/
+var/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Frontend dependencies
+node_modules/
+
+# Test and analysis output
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Editors and temporary files
+.vscode/
+.idea/
+tempCodeRunnerFile.py

@@ -1,0 +1,585 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+{% set P = 'img/community/photos/' %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050705">
+  <meta name="description" content="GAMKERS — a community-driven cybersecurity and technology ecosystem. Learn, build, share and grow through workshops, CTFs, hardware security and real-world projects.">
+  <meta property="og:title" content="GAMKERS · Cybersecurity & Technology Community">
+  <meta property="og:description" content="Learn. Build. Share. Grow. 200K+ on Instagram, 10,000+ students trained.">
+  <meta property="og:image" content="{{ url_for('static', filename=P + 'students.jpg', _external=True) }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>GAMKERS · Cybersecurity &amp; Technology Community</title>
+  <link rel="preload" as="image" href="{{ url_for('static', filename='img/logo.png') }}">  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <script src="{{ url_for('static', filename='js/community-bg.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/community.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/landing-fit.js') }}" defer></script>
+</head>
+<body>
+{% include 'community/_icons.html' %}
+
+{# ═════════════════════════ NAV ═════════════════════════ #}
+<nav class="c-nav">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="#home"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="c-nav-links">
+      <a href="#about" data-section="about">About</a>
+      <a href="#what-we-do" data-section="what-we-do">What We Do</a>
+      <a href="#hardware" data-section="hardware">Hardware</a>
+      <a href="#products" data-section="products">Products</a>
+      <a href="#events" data-section="events">Events</a>
+      <a href="#team" data-section="team">Team</a>
+      <a href="#sponsors" data-section="sponsors">Sponsors</a>
+      <a href="#faq" data-section="faq">FAQ</a>
+    </div>
+    <div class="c-nav-cta">
+      {% if current_user.is_authenticated %}<a class="c-nav-admin" href="{{ url_for('main.admin') }}">{{ ic('layers', 'ic-sm') }} Admin</a>{% endif %}
+      <a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-solid">Join Community</button></a>
+    </div>
+    <button class="c-nav-toggle" aria-label="Toggle menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+    </button>
+  </div>
+  <div class="c-nav-mobile">
+    <a href="#about">About</a><a href="#what-we-do">What We Do</a><a href="#hardware">Hardware</a><a href="#products">Products</a>
+    <a href="#events">Events</a><a href="#team">Team</a><a href="#sponsors">Sponsors</a><a href="#faq">FAQ</a>
+    <a href="{{ url_for('main.admin') }}">Admin sign in</a>
+    <a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-solid btn-full">Join Community</button></a>
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}<div class="c-flash-stack" aria-live="polite">{% for category, message in messages %}<div class="c-flash c-flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+{% endwith %}
+
+{# ══════════════ 1 · HERO ══════════════ #}
+<section id="home" class="l-sec full l-hero" data-net-bg>
+  <div class="l-wrap">
+    <div class="l-hero-grid">
+      <div class="l-reveal from-left">
+        <span class="l-pill"><b>Community</b> Cybersecurity &amp; Technology</span>
+        <h1>Learn. <span class="accent">Build.</span><br>Share. <span class="accent">Grow.</span></h1>
+        <p class="l-lead">A community-driven ecosystem for learners, builders, researchers and security enthusiasts to explore, learn and innovate in cybersecurity and beyond.</p>
+        <div class="l-btn-row">
+          <a class="l-btn l-btn-primary" href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer">{{ ic('discord') }} Join the Community {{ ic('arrow') }}</a>
+          <a class="l-btn l-btn-ghost" href="#events">{{ ic('calendar') }} Upcoming events</a>
+        </div>
+        <div class="l-trust">{{ ic('shield', 'ic-lg') }}<span><b>One community. Bigger impact.</b><br>Workshops, CTFs and hardware labs — online and offline.</span></div>
+      </div>
+      <div class="l-emblem l-reveal zoom" aria-hidden="true">
+        <span class="em-glow"></span>
+        <span class="em-ring r1"></span>
+        <span class="em-ring r2"></span>
+        <span class="em-ring r3"><i></i></span>
+        <img class="em-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="" width="768" height="768">
+        <div class="l-badge b1"><span class="l-icon">{{ ic('instagram') }}</span><div><b>200K+</b><span>Instagram followers</span></div></div>
+        <div class="l-badge b2"><span class="l-icon">{{ ic('flag') }}</span><div><b>CTF arenas</b><span>Online &amp; offline</span></div></div>
+        <div class="l-badge b3"><span class="l-icon">{{ ic('cpu') }}</span><div><b>Hardware labs</b><span>RF · IoT · ESP32</span></div></div>
+      </div>
+    </div>
+    <div class="l-statbar l-stagger">
+      <div class="l-stat"><span class="l-icon">{{ ic('instagram') }}</span><div><b data-count="200" data-suffix="K+">200K+</b><span>Instagram Followers</span></div></div>
+      <div class="l-stat"><span class="l-icon">{{ ic('discord') }}</span><div><b data-count="3.7" data-suffix="K+">3.7K+</b><span>Discord Members</span></div></div>
+      <div class="l-stat"><span class="l-icon">{{ ic('youtube') }}</span><div><b data-count="10" data-suffix="K+">10K+</b><span>YouTube Subscribers</span></div></div>
+      <div class="l-stat"><span class="l-icon">{{ ic('cap') }}</span><div><b data-count="10000" data-suffix="+" data-comma>10,000+</b><span>Students Trained</span></div></div>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 2 · NEXT EVENT (photo backdrop) ══════════════ #}
+{% if next_event %}
+<section class="l-sec full t-photo l-ticket-sec">
+  <img class="l-bgimg" src="{{ url_for('static', filename=P + 'audience.jpg') }}" alt="" loading="lazy">
+  <div class="l-overlay"></div>
+  <div class="l-wrap">
+    <div class="ticket l-reveal">
+      <div class="ticket-main">
+        <p class="eyebrow"><span class="live-dot"></span> Next event · Registrations open</p>
+        <h2>{{ next_event.title }}</h2>
+        {% if next_event.description %}<p class="ticket-desc">{{ next_event.description }}</p>{% endif %}
+        <div class="l-btn-row">
+          <a class="l-btn l-btn-primary" href="{{ url_for('forms.public_form', public_id=next_event.public_id) }}">View details &amp; register {{ ic('arrow') }}</a>
+        </div>
+      </div>
+      <div class="ticket-stub" data-countdown="{{ next_event_iso }}">
+        <p class="stub-label">Admit one</p>
+        <div class="stub-date"><b>{{ next_event.event_start_at.strftime('%d.%m') }}</b><span>{{ next_event.event_start_at.strftime('%A') }}<br>{{ next_event.event_start_at.strftime('%b %Y') }}</span></div>
+        <dl class="stub-meta">
+          {% if next_event.event_location %}<div><dt>{{ ic('pin') }} Venue</dt><dd>{{ next_event.event_location }}</dd></div>{% endif %}
+          <div><dt>{{ ic('clock') }} Time</dt><dd>{{ next_event.event_start_at.strftime('%I:%M %p') }}{% if next_event.event_end_at %} – {{ next_event.event_end_at.strftime('%I:%M %p') }}{% endif %} {{ next_event.event_timezone }}</dd></div>
+        </dl>
+        <p class="stub-label">Starts in</p>
+        <div class="countdown">
+          <div><b data-cd="d">--</b><span>Days</span></div><div><b data-cd="h">--</b><span>Hrs</span></div>
+          <div><b data-cd="m">--</b><span>Min</span></div><div><b data-cd="s">--</b><span>Sec</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ══════════════ 3 · ABOUT (dotted surface) ══════════════ #}
+<section id="about" class="l-sec full t-surface">
+  <div class="l-wrap">
+    <div class="l-about-grid">
+      <div class="l-stack l-reveal from-left">
+        <div class="ph p1"><img src="{{ url_for('static', filename=P + 'team.jpg') }}" alt="Gamkers learners collaborating on a project" loading="lazy"></div>
+        <div class="ph p2"><img src="{{ url_for('static', filename='img/community/community.jpg') }}" alt="Gamkers community session" loading="lazy"></div>
+        <div class="l-badge"><span class="l-icon">{{ ic('cap') }}</span><div><b>10,000+</b><span>students trained</span></div></div>
+      </div>
+      <div class="l-reveal from-right">
+        <span class="l-eyebrow">About Gamkers</span>
+        <h2 class="l-h2">More than a community. <em>An ecosystem for builders.</em></h2>
+        <p class="l-lead">Gamkers is a community-driven cybersecurity and technology education initiative dedicated to making advanced technology accessible through practical learning, hands-on experiences and collaborative innovation — bringing together students, enthusiasts, developers, researchers and professionals.</p>
+        <blockquote class="l-quote">“We believe cybersecurity cannot be mastered through theory alone. It requires experimentation, problem-solving, collaboration and real-world exposure.”</blockquote>
+        <div class="l-mv">
+          <div class="l-card"><span class="l-icon">{{ ic('target') }}</span><h4>Our Mission</h4><p>To make cybersecurity and emerging technology education accessible, practical and community-driven.</p></div>
+          <div class="l-card"><span class="l-icon">{{ ic('eye') }}</span><h4>Our Vision</h4><p>A generation of skilled professionals, independent researchers and innovators building a safer digital world.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="l-grid-4 l-pillars l-stagger l-swipe">
+      <div class="l-card"><span class="l-icon">{{ ic('book') }}</span><h4>Education</h4><p>Practical and industry-relevant learning.</p></div>
+      <div class="l-card"><span class="l-icon">{{ ic('users') }}</span><h4>Community</h4><p>A collaborative space for learners, builders and researchers.</p></div>
+      <div class="l-card"><span class="l-icon">{{ ic('bulb') }}</span><h4>Innovation</h4><p>Hands-on projects, experimentation and real-world solutions.</p></div>
+      <div class="l-card"><span class="l-icon">{{ ic('share') }}</span><h4>Collaboration</h4><p>Working with colleges, communities and industry partners.</p></div>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 4 · REACH & IMPACT (brand green) ══════════════ #}
+<section id="impact" class="l-sec full t-green l-impact">
+  <div class="l-wrap">
+    <div class="l-head l-reveal">
+      <span class="l-eyebrow">Our reach &amp; impact</span>
+      <h2 class="l-h2">A growing community creating <em>real impact.</em></h2>
+      <p class="l-lead">From digital content to hands-on workshops, Gamkers has built a strong and active community of learners, builders and security enthusiasts.</p>
+    </div>
+    <div class="l-bignums l-stagger">
+      <div class="l-bignum">{{ ic('instagram') }}<b data-count="200" data-suffix="K+">200K+</b><h4>Instagram Followers</h4><p>A growing audience for cybersecurity and technology education.</p></div>
+      <div class="l-bignum">{{ ic('discord') }}<b data-count="3.7" data-suffix="K+">3.7K+</b><h4>Discord Members</h4><p>An active space for discussions, learning and collaboration.</p></div>
+      <div class="l-bignum">{{ ic('youtube') }}<b data-count="10" data-suffix="K+">10K+</b><h4>YouTube Subscribers</h4><p>Tutorials and technical learning resources.</p></div>
+      <div class="l-bignum">{{ ic('cap') }}<b data-count="10000" data-suffix="+" data-comma>10,000+</b><h4>Students Trained</h4><p>Through online and offline workshops and training programs.</p></div>
+    </div>
+    <div class="l-impact-split">
+      <div>
+        <h3>Our learning initiatives</h3>
+        <div class="l-grid-2 l-stagger l-swipe">
+          <div class="l-card"><span class="l-icon">{{ ic('building') }}</span><div><h4>Offline Workshops</h4><p>Hands-on learning in colleges and technical events.</p></div></div>
+          <div class="l-card"><span class="l-icon">{{ ic('monitor') }}</span><div><h4>Online Sessions</h4><p>Live technical workshops and educational programs.</p></div></div>
+          <div class="l-card"><span class="l-icon">{{ ic('flag') }}</span><div><h4>CTF Challenges</h4><p>Competitions that test and improve practical skills.</p></div></div>
+          <div class="l-card"><span class="l-icon">{{ ic('tower') }}</span><div><h4>Hardware Hands-on</h4><p>Practical exposure to hardware, RF and embedded security.</p></div></div>
+        </div>
+      </div>
+      <div class="l-reveal">
+        <h3>Our impact areas</h3>
+        <div class="l-chips">
+          <span class="l-chip">{{ ic('shield') }} Cybersecurity Education</span>
+          <span class="l-chip">{{ ic('cpu') }} Hardware &amp; Embedded Security</span>
+          <span class="l-chip">{{ ic('cloud') }} Cloud &amp; Data Technologies</span>
+          <span class="l-chip">{{ ic('sparkles') }} AI &amp; Emerging Technologies</span>
+          <span class="l-chip">{{ ic('users') }} Community &amp; Collaboration</span>
+          <span class="l-chip">{{ ic('trophy') }} Events &amp; Competitions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="l-marquee-band" aria-hidden="true">
+    <div class="l-marquee">
+      {% for _ in range(2) %}<span>Real learning</span>{{ ic('zap') }}<span class="o">Real skills</span>{{ ic('zap') }}<span>Real opportunities</span>{{ ic('zap') }}<span class="o">One community</span>{{ ic('zap') }}<span>Bigger impact</span>{{ ic('zap') }}{% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 5 · WHAT WE DO (grid) ══════════════ #}
+<section id="what-we-do" class="l-sec full t-grid">
+  <div class="l-wrap">
+    <div class="l-wwd-top">
+      <div class="l-head l-reveal from-left">
+        <span class="l-eyebrow">What we do</span>
+        <h2 class="l-h2">Learn. Experiment. <em>Build. Secure.</em></h2>
+        <p class="l-lead">A practical, hands-on learning ecosystem covering cybersecurity, technology and emerging domains for students, developers and professionals.</p>
+      </div>
+      <div class="l-photo-card l-reveal from-right">
+        <img src="{{ url_for('static', filename=P + 'matrix.jpg') }}" alt="" loading="lazy">
+        <div class="cap"><b>Hands-on. Practical. Real-world.</b><span>Live sessions, real devices, tools and projects — bridging theory and practice.</span></div>
+      </div>
+    </div>
+    <div class="l-grid-3 l-domains l-stagger l-swipe">
+      <div class="l-card"><span class="l-num">01</span><span class="l-icon">{{ ic('shield') }}</span><h4>Cybersecurity Education</h4><p>Ethical hacking, penetration testing, vulnerability assessment, web security and security research.</p></div>
+      <div class="l-card"><span class="l-num">02</span><span class="l-icon">{{ ic('activity') }}</span><h4>Security Operations (SOC)</h4><p>SOC fundamentals, SIEM, threat detection, incident response and digital forensics.</p></div>
+      <div class="l-card"><span class="l-num">03</span><span class="l-icon">{{ ic('cpu') }}</span><h4>Hardware &amp; Embedded Security</h4><p>IoT security, ESP32, embedded systems, RF security, SDR and hardware penetration testing.</p></div>
+      <div class="l-card"><span class="l-num">04</span><span class="l-icon">{{ ic('sparkles') }}</span><h4>Artificial Intelligence</h4><p>Generative AI, AI agents, AI-powered security tools and intelligent automation.</p></div>
+      <div class="l-card"><span class="l-num">05</span><span class="l-icon">{{ ic('network') }}</span><h4>Network &amp; Infrastructure</h4><p>Network analysis, protocol security, Linux, infrastructure security and cloud security.</p></div>
+      <div class="l-card"><span class="l-num">06</span><span class="l-icon">{{ ic('code') }}</span><h4>Development &amp; Engineering</h4><p>Python, automation, reverse engineering, open-source development and real-world projects.</p></div>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 6 · PROGRAMS & TOOLS (dark) ══════════════ #}
+<section id="programs" class="l-sec full t-dark">
+  <div class="l-wrap">
+    <div class="l-head center l-reveal">
+      <span class="l-eyebrow">Programs &amp; tools</span>
+      <h2 class="l-h2">Structured paths. <em>Real tools.</em></h2>
+    </div>
+    <div class="l-program l-reveal zoom">
+      <div class="l-program-media">
+        <img src="{{ url_for('static', filename=P + 'code.jpg') }}" alt="" loading="lazy">
+        <div class="over"><span>Bootcamp</span><h3>Two comprehensive courses in one bootcamp</h3></div>
+      </div>
+      <div class="l-program-body">
+        <div><h4>{{ ic('code') }} Python Programming</h4>
+          <ul class="l-ticks"><li>{{ ic('check') }}Fundamentals of Python</li><li>{{ ic('check') }}Functional &amp; object-oriented programming</li><li>{{ ic('check') }}Web scraping and automation</li><li>{{ ic('check') }}Real-world project implementation</li></ul></div>
+        <div><h4>{{ ic('shield') }} Ethical Hacking</h4>
+          <ul class="l-ticks"><li>{{ ic('check') }}MAC changers, ARP and DNS spoofers</li><li>{{ ic('check') }}Build sniffers and network scanners</li><li>{{ ic('check') }}Pen-testing websites and systems</li><li>{{ ic('check') }}Exploit vulnerabilities ethically</li></ul></div>
+        <div class="l-program-cta"><a class="l-btn l-btn-primary" href="https://course.gamkers.in/" target="_blank" rel="noopener noreferrer">Enroll now {{ ic('arrow') }}</a></div>
+      </div>
+    </div>
+    <div class="l-grid-3 l-stagger l-swipe">
+      <a class="l-card l-tool" href="https://github.com/gamkers" target="_blank" rel="noopener noreferrer"><span class="tag">CLI tool</span><span class="l-icon">{{ ic('terminal') }}</span><h4>FlawHunt CLI</h4><p>AI-powered terminal to simplify commands, automate workflows and secure your environment.</p><span class="go">View on GitHub {{ ic('arrow', 'ic-sm') }}</span></a>
+      <a class="l-card l-tool" href="https://gamkersgpt.studentbae.in/" target="_blank" rel="noopener noreferrer"><span class="tag">Mobile app</span><span class="l-icon">{{ ic('phone') }}</span><h4>GamkersGPT</h4><p>Your cybersecurity AI assistant on the go — ask, learn and solve challenges from your phone.</p><span class="go">Open app {{ ic('arrow', 'ic-sm') }}</span></a>
+      <a class="l-card l-tool" href="https://gamkerscyberanalysis.streamlit.app" target="_blank" rel="noopener noreferrer"><span class="tag">Web app</span><span class="l-icon">{{ ic('search') }}</span><h4>SentinelX</h4><p>AI-powered threat analysis. Upload, analyze and understand threats in real time.</p><span class="go">Launch app {{ ic('arrow', 'ic-sm') }}</span></a>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 7 · HARDWARE (circuit photo + network) ══════════════ #}
+<section id="hardware" class="l-sec full t-photo l-hw" data-net-bg>
+  <img class="l-bgimg" src="{{ url_for('static', filename=P + 'circuit.jpg') }}" alt="" loading="lazy">
+  <div class="l-overlay"></div>
+  <div class="l-wrap">
+    <div class="l-head l-reveal">
+      <span class="l-eyebrow">Our speciality</span>
+      <h2 class="l-h2">Beyond software. <em>Into hardware.</em></h2>
+      <p class="l-lead">Hardware-focused, hands-on cybersecurity education with practical exposure to devices, communication systems and embedded technologies — on real hardware, in a safe and guided environment.</p>
+    </div>
+    <div class="l-grid-3 l-stagger l-swipe">
+      {% for h in [
+        ['radio','Radio Frequency (RF) Security','Wireless communication analysis, protocol exploration and security testing.'],
+        ['wave','Software Defined Radio (SDR)','Signal analysis, protocol exploration and real-world RF experiments.'],
+        ['router','IoT & Embedded Security','Security testing for IoT devices, ESP32 and embedded systems.'],
+        ['wrench','Hardware Penetration Testing','Hands-on security testing of physical devices and interfaces.'],
+        ['binary','Firmware Analysis','Extracting, analyzing and understanding device firmware.'],
+        ['wifi','Wireless & Device Security','Wi-Fi, Bluetooth, BLE, NFC, RFID and other wireless technologies.']
+      ] %}
+      <div class="l-card row"><span class="l-icon">{{ ic(h[0]) }}</span><div><h4>{{ h[1] }}</h4><p>{{ h[2] }}</p></div></div>
+      {% endfor %}
+    </div>
+    <div class="l-devices l-reveal">
+      <div class="l-devices-head">{{ ic('wrench', 'ic-sm') }} Tools &amp; devices we work with</div>
+      <div class="l-marquee">
+        {% for _ in range(2) %}{% for d in ['Flipper Zero','HackRF One','Pwnagotchi','LilyGO T-Deck','M5Stack Devices','ESP32 / ESP8266'] %}<span class="l-device">{{ ic('cpu') }}{{ d }}</span>{% endfor %}{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 8 · PRODUCTS (spotlight) ══════════════ #}
+<section id="products" class="l-sec full l-products">
+  <div class="l-wrap">
+    <div class="l-head center l-reveal">
+      <span class="l-eyebrow">Gamkers hardware</span>
+      <h2 class="l-h2">Built for hackers. <em>Engineered to dominate.</em></h2>
+      <p class="l-lead">Purpose-built devices for security research, wireless experimentation and IoT development — designed for responsible, ethical use.</p>
+    </div>
+    <div class="l-prod-grid l-stagger l-swipe">
+      <a class="l-card l-prod" href="{{ url_for('main.product_ghostchip') }}">
+        <div class="l-prod-img"><span class="tagx">New</span><img src="{{ url_for('static', filename='img/community/ghostchip/frontview.jpeg') }}" alt="GhostChip" loading="lazy"></div>
+        <div class="l-prod-body">
+          <span class="kind">ESP32-S3 · AI BadUSB</span><h3>GhostChip</h3><span class="sub">The world's first AI-powered BadUSB</span>
+          <p>Pocket-sized ESP32-S3 USB platform with AI DuckyScript generation, Wi-Fi/BLE tooling, MicroSD and an Android + Web companion app.</p>
+          <div class="feats"><span>AI script generation</span><span>Wi-Fi + BLE</span><span>Plug &amp; play</span></div>
+          <span class="go">Explore GhostChip {{ ic('arrow', 'ic-sm') }}</span>
+        </div>
+      </a>
+      <a class="l-card l-prod" href="{{ url_for('main.product_phantom32') }}">
+        <div class="l-prod-img"><span class="tagx">Flagship</span><img src="{{ url_for('static', filename='img/community/phantom/front.jpeg') }}" alt="Phantom32" loading="lazy"></div>
+        <div class="l-prod-body">
+          <span class="kind">Handheld security tool</span><h3>Phantom32</h3><span class="sub">Handheld wireless &amp; Sub-GHz field tool</span>
+          <p>Sub-GHz (CC1101), Wi-Fi, BLE, IR and HID in one handheld with OLED display, 5-way navigation, LiPo battery and GPIO expansion.</p>
+          <div class="feats"><span>CC1101 Sub-GHz</span><span>OLED + nav pad</span><span>LiPo + USB-C</span></div>
+          <span class="go">Explore Phantom32 {{ ic('arrow', 'ic-sm') }}</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 9 · EVENTS (dark surface) ══════════════ #}
+{% set fallback = ['workshop.jpg','conference.jpg','audience.jpg','students.jpg','team.jpg'] %}
+<section id="events" class="l-sec full t-surface">
+  <div class="l-wrap">
+    <div class="l-head l-reveal">
+      <span class="l-eyebrow">Events &amp; experiences</span>
+      <h2 class="l-h2">Learn together. <em>Build together.</em></h2>
+      <p class="l-lead">Online and offline initiatives that bridge academic knowledge and real-world skills. Every event has its own page with full details and registration.</p>
+    </div>
+    {% if upcoming_events %}
+      <div class="l-ev-rail l-stagger">
+        {% for ev in upcoming_events %}
+          <a class="l-card l-ev" href="{{ url_for('forms.public_form', public_id=ev.public_id) }}">
+            <div class="l-ev-media">
+              {% if ev.banner_image_path %}<img src="{{ url_for('forms.public_form_banner', public_id=ev.public_id) }}" alt="{{ ev.title }}" loading="lazy">
+              {% else %}<img src="{{ url_for('static', filename=P + fallback[loop.index0 % fallback|length]) }}" alt="" loading="lazy">{% endif %}
+              <div class="shade"></div>
+              {% if ev.event_start_at %}<div class="l-ev-date"><span>{{ ev.event_start_at.strftime('%b') }}</span><b>{{ ev.event_start_at.strftime('%d') }}</b></div>{% endif %}
+              <span class="l-ev-status"><span class="live-dot"></span> Open</span>
+            </div>
+            <div class="l-ev-body">
+              <h4>{{ ev.title }}</h4>
+              <div class="l-ev-meta">
+                {% if ev.event_start_at %}<span>{{ ic('calendar') }}{{ ev.event_start_at.strftime('%A, %d %B %Y') }}</span><span>{{ ic('clock') }}{{ ev.event_start_at.strftime('%I:%M %p') }}{% if ev.event_end_at %} – {{ ev.event_end_at.strftime('%I:%M %p') }}{% endif %} {{ ev.event_timezone }}</span>{% endif %}
+                {% if ev.event_location %}<span>{{ ic('pin') }}{{ ev.event_location }}</span>{% endif %}
+              </div>
+              {% if ev.description %}<p>{{ ev.description }}</p>{% endif %}
+              <div class="l-ev-go"><span>View details &amp; register</span>{{ ic('arrow') }}</div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+      {% if upcoming_events|length > 3 %}<div class="l-rail-hint"><span>{{ upcoming_events|length }} upcoming events</span><span>Scroll sideways for more {{ ic('arrow') }}</span></div>{% endif %}
+    {% else %}
+      <div class="l-card l-ev-empty l-reveal"><span class="l-icon">{{ ic('calendar') }}</span><h4>No upcoming events right now</h4><p>Join our Discord to be the first to hear about the next workshop or CTF.</p></div>
+    {% endif %}
+
+    {% if completed_events %}
+      <div class="l-past l-reveal"><a href="#past-events">{{ ic('flag', 'ic-sm') }} {{ completed_events|length }} completed event{{ 's' if completed_events|length != 1 }} · see recaps &amp; feedback {{ ic('arrow', 'ic-sm') }}</a></div>
+    {% endif %}
+  </div>
+</section>
+
+{# ══════════════ 9b · EXPERIENCES (workshop photo) ══════════════ #}
+<section id="experiences" class="l-sec full t-photo l-exp">
+  <img class="l-bgimg" src="{{ url_for('static', filename=P + 'workshop.jpg') }}" alt="" loading="lazy">
+  <div class="l-overlay"></div>
+  <div class="l-wrap">
+    <div class="l-head l-reveal">
+      <span class="l-eyebrow">How we learn</span>
+      <h2 class="l-h2">Practical learning <em>at scale.</em></h2>
+      <p class="l-lead">From live workshops to college events, Gamkers creates immersive learning experiences that bring real-world exposure and practical skills.</p>
+    </div>
+    <div class="l-exp-grid">
+      <div class="l-reveal from-left">
+        <h3>Event highlights</h3>
+        <div class="l-hl l-swipe">
+          <div class="l-card"><span class="l-icon">{{ ic('flask') }}</span><h4>Technical Workshops</h4><p>Hands-on sessions on cybersecurity and emerging tech.</p></div>
+          <div class="l-card"><span class="l-icon">{{ ic('wrench') }}</span><h4>Hardware Workshops</h4><p>Real-device experiences with RF, IoT and embedded security.</p></div>
+          <div class="l-card"><span class="l-icon">{{ ic('trophy') }}</span><h4>CTF Competitions</h4><p>Challenges that build real-world problem-solving skills.</p></div>
+          <div class="l-card"><span class="l-icon">{{ ic('cap') }}</span><h4>College Events</h4><p>Workshops and technical talks in collaboration with colleges.</p></div>
+        </div>
+      </div>
+      <div class="l-reveal from-right">
+        <h3>Online &amp; offline</h3>
+        <div class="l-onoff l-swipe">
+          <div class="l-card"><h5>{{ ic('monitor') }} Online</h5><ul class="l-ticks"><li>{{ ic('check') }}Live technical workshops</li><li>{{ ic('check') }}Training programs</li><li>{{ ic('check') }}CTF competitions</li><li>{{ ic('check') }}Expert-led sessions</li><li>{{ ic('check') }}Community learning</li></ul></div>
+          <div class="l-card"><h5>{{ ic('building') }} Offline</h5><ul class="l-ticks"><li>{{ ic('check') }}Hands-on workshops</li><li>{{ ic('check') }}Hardware hacking demos</li><li>{{ ic('check') }}RF security sessions</li><li>{{ ic('check') }}College events &amp; meetups</li><li>{{ ic('check') }}Practical training</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 9c · COMPLETED EVENTS & FEEDBACK (dotted dark) ══════════════ #}
+{% macro stars(score) -%}<span class="l-stars" aria-label="{{ score }} out of 5">{% for i in range(1, 6) %}{{ ic('star', 'on' if score and i <= score|round(0, 'common') else '') }}{% endfor %}</span>{%- endmacro %}
+{% if completed_events %}
+<section id="past-events" class="l-sec full t-surface">
+  <div class="l-wrap">
+    <div class="l-past-top">
+      <div class="l-head l-reveal">
+        <span class="l-eyebrow">Completed events</span>
+        <h2 class="l-h2">What we've built. <em>What attendees said.</em></h2>
+        <p class="l-lead">Recaps of past workshops, CTFs and sessions — with ratings and feedback from the people who were there.</p>
+      </div>
+    </div>
+    <div class="l-ev-rail l-stagger">
+      {% for item in completed_events %}
+        {% set ev = item.event %}{% set fb = item.feedback %}
+        <a class="l-card l-ev l-done" href="{{ url_for('forms.public_form', public_id=ev.public_id) }}#feedback">
+          <div class="l-ev-media">
+            {% if ev.banner_image_path %}<img src="{{ url_for('forms.public_form_banner', public_id=ev.public_id) }}" alt="{{ ev.title }}" loading="lazy">
+            {% else %}<img src="{{ url_for('static', filename=P + ['conference.jpg','audience.jpg','workshop.jpg','students.jpg'][loop.index0 % 4]) }}" alt="" loading="lazy">{% endif %}
+            <div class="shade"></div>
+            <span class="l-ev-status done">{{ ic('check', 'ic-sm') }} Completed</span>
+            {% if ev.event_start_at %}<div class="l-ev-date"><span>{{ ev.event_start_at.strftime('%b') }}</span><b>{{ ev.event_start_at.strftime('%d') }}</b></div>{% endif %}
+          </div>
+          <div class="l-ev-body">
+            <h4>{{ ev.title }}</h4>
+            <div class="l-done-stats">
+              {% if fb.count %}<span class="score">{{ stars(fb.average) }} <b>{{ fb.average }}</b> <small>({{ fb.count }})</small></span>{% else %}<span class="score muted">No ratings yet</span>{% endif %}
+              {% if item.registrations %}<span>{{ ic('users', 'ic-sm') }} {{ item.registrations }} attended</span>{% endif %}
+            </div>
+            {% if fb.quotes %}<p class="l-done-quote">“{{ fb.quotes[0].text }}” <small>— {{ fb.quotes[0].name }}</small></p>
+            {% elif ev.description %}<p>{{ ev.description }}</p>{% endif %}
+            <div class="l-ev-go"><span>Recap &amp; feedback</span>{{ ic('arrow') }}</div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    {% if testimonials %}
+    <div class="l-testimonials l-reveal" aria-label="Attendee feedback">
+      <div class="l-marquee">
+        {% for _ in range(2 if testimonials|length > 2 else 1) %}{% for q in testimonials %}
+        <figure class="l-testi">
+          {{ ic('quote', 'q') }}
+          <p>{{ q.text }}</p>
+          <footer><span class="av">{{ q.name[0] }}</span><div><b>{{ q.name }}</b><span>{{ q.org }}{% if q.org %} · {% endif %}{{ q.event.title }}</span></div>{% if q.rating %}{{ stars(q.rating) }}{% endif %}</footer>
+        </figure>
+        {% endfor %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{# ══════════════ 10 · TEAM (purple) ══════════════ #}
+{% set contributors = ['Narayanan','Kavin Karthikeyan','Vishal M','D. S. Kamali','Jeyaratnam Jenosan','Abarna S','M. Akash','Balasaktheeswar R','Sanjeev Kumar','Raj Kisan Sathiyan','Praveen','Aadhish','Jaiganesh','Nidhish Kumaran','Yuvaraj','Dharshan','Thiruselvam K','Sudarsan Kumar','Vinoth','Adwaith','Santhosh','Santhosh S','Sachidanand S','Vignesh M','Sneharini S','Abhilash H','Mahendiran M','Harish Balaji','Badmanaban','Abdul Aleem','Ashwanth','Vishal Muthuvel','Jayanth'] %}
+<section id="team" class="l-sec full t-purple">
+  <div class="l-wrap">
+    <div class="l-head center l-reveal">
+      <span class="l-eyebrow">Our team</span>
+      <h2 class="l-h2">The people <em>behind Gamkers.</em></h2>
+      <p class="l-lead">Cybersecurity enthusiasts, developers, educators and contributors making cybersecurity learning practical, accessible and community-driven.</p>
+    </div>
+    <div class="l-leaders l-stagger l-swipe">
+      {% for l in [['AM','Akash M.','Cybersecurity Tech Lead','shield'],['BJ','Balaji','VAPT Lead','target'],['VW','Vigneshwaran','Senior Developer','code']] %}
+      <div class="l-card l-leader"><div class="l-avatar"><span>{{ l[0] }}</span></div><div><h4>{{ l[1] }}</h4><span class="role">{{ ic(l[3]) }} {{ l[2] }}</span></div></div>
+      {% endfor %}
+    </div>
+    <div class="l-contrib-top l-reveal">
+      <div><h3>Our contributors</h3><p>Learners, builders and researchers contributing through content, research, events and community initiatives.</p></div>
+      <span class="l-count">{{ contributors|length }}</span>
+    </div>
+    <div class="l-names l-reveal">
+      {% for row in [contributors[:16], contributors[16:]] %}
+      <div class="l-marquee {{ 'rev' if loop.last }}">
+        {% for _ in range(2) %}{% for n in row %}<span class="l-name"><i>{{ n[0] }}</i>{{ n }}</span>{% endfor %}{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="l-collab l-reveal">
+      <span class="l-chip">{{ ic('search') }} Research &amp; Exploration</span>
+      <span class="l-chip">{{ ic('book') }} Content &amp; Education</span>
+      <span class="l-chip">{{ ic('cpu') }} Hardware &amp; Projects</span>
+      <span class="l-chip">{{ ic('users') }} Community &amp; Events</span>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 10b · SPONSORS (white) ══════════════ #}
+<section id="sponsors" class="l-sec full t-white">
+  <div class="l-wrap">
+    <div class="l-head center l-reveal">
+      <span class="l-eyebrow">Our sponsors</span>
+      <h2 class="l-h2">Powered by the people <em>who build the hardware.</em></h2>
+      <p class="l-lead">Our sponsors make the devices our community learns on — from ESP32 and LoRa boards to SDRs and single-board computers. Thank you for backing hands-on security education.</p>
+    </div>
+    <div class="l-sponsors l-stagger">
+      {% for s in [
+        ['LILYGO','lilygo.svg','https://lilygo.cc/','ESP32 & LoRa IoT development boards',''],
+        ['OpenSourceSDRLab','opensourcesdrlab.png','https://opensourcesdrlab.com/','Software Defined Radio products & solutions',''],
+        ['M5Stack','m5stack.svg','https://m5stack.com/','Modular IoT dev kits for rapid prototyping',''],
+        ['Meshnology','meshnology.png','https://meshnology.com/','Meshtastic devices, LoRa radios & dev boards','invert'],
+        ['Orange Pi','orangepi.png','http://www.orangepi.org/','Open-source single-board computers','']
+      ] %}
+      <a class="l-sponsor" href="{{ s[2] }}" target="_blank" rel="noopener noreferrer sponsored">
+        <span class="logo"><img class="{{ s[4] }}" src="{{ url_for('static', filename='img/sponsors/' + s[1]) }}" alt="{{ s[0] }} logo" loading="lazy"></span>
+        <span class="name"><b>{{ s[0] }}</b><small class="desc">{{ s[3] }}</small></span>
+        <span class="visit">Visit site {{ ic('arrow') }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    <div class="l-sponsor-cta l-reveal">
+      <div><b>Want to support the community?</b><span>Partner with Gamkers on workshops, CTFs and hardware labs.</span></div>
+      <a class="l-btn l-btn-primary" href="mailto:gamkers@gmail.com?subject=Sponsoring%20Gamkers">{{ ic('mail') }} Become a sponsor {{ ic('arrow') }}</a>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 11 · FAQ (dark) ══════════════ #}
+<section id="faq" class="l-sec full t-dark">
+  <div class="l-wrap">
+    <div class="l-faq-grid">
+      <div class="l-faq-side l-reveal from-left">
+        <span class="l-eyebrow">FAQ</span>
+        <h2 class="l-h2">Questions, <em>answered.</em></h2>
+        <p class="l-lead">Everything you need to know about joining, events and contributing.</p>
+        <div class="l-photo-card"><img src="{{ url_for('static', filename=P + 'workshop.jpg') }}" alt="" loading="lazy"><div class="cap"><b>Hands-on, every time.</b><span>Real tools, real devices, guided labs.</span></div></div>
+        <div class="contact"><span class="l-icon">{{ ic('mail') }}</span><div><b>Still have a question?</b><a href="mailto:gamkers@gmail.com">gamkers@gmail.com</a></div></div>
+      </div>
+      <div class="l-faq l-stagger">
+        <details open><summary><span class="q">Who can join Gamkers?</span><span class="pm">{{ ic('plus') }}</span></summary><p>Anyone curious about cybersecurity and technology — students taking their first step, developers exploring new domains, and professionals who want to share knowledge.</p></details>
+        <details><summary><span class="q">Do I need prior experience?</span><span class="pm">{{ ic('plus') }}</span></summary><p>No. Sessions range from fundamentals to advanced topics, and the approach is hands-on: you learn by experimenting with real tools, devices and projects in a guided environment.</p></details>
+        <details><summary><span class="q">How do I register for an event?</span><span class="pm">{{ ic('plus') }}</span></summary><p>Open any event in the <a href="#events">Events</a> section. Each event has its own page with the date, time, venue and full description — fill in the registration form there.</p></details>
+        <details><summary><span class="q">Can my college host a Gamkers workshop?</span><span class="pm">{{ ic('plus') }}</span></summary><p>Yes. We collaborate with colleges on workshops, technical talks and hands-on sessions, including hardware and RF security demos. Reach us at <a href="mailto:gamkers@gmail.com">gamkers@gmail.com</a>.</p></details>
+        <details><summary><span class="q">How can I become a contributor?</span><span class="pm">{{ ic('plus') }}</span></summary><p>Join our Discord and get involved in research, content, hardware projects or community events.</p></details>
+        <details><summary><span class="q">Where can I follow Gamkers?</span><span class="pm">{{ ic('plus') }}</span></summary><p>Instagram <a href="https://www.instagram.com/gamkers/" target="_blank" rel="noopener noreferrer">@gamkers</a>, YouTube <a href="https://www.youtube.com/@gamkeryt/featured" target="_blank" rel="noopener noreferrer">Gamkers</a>, and our <a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer">Discord community</a>.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ══════════════ 12 · JOIN (green over photo) ══════════════ #}
+<section id="join" class="l-sec full t-photo l-join" data-net-bg>
+  <img class="l-bgimg" src="{{ url_for('static', filename=P + 'hacker.jpg') }}" alt="" loading="lazy">
+  <div class="l-overlay"></div>
+  <div class="l-wrap">
+    <div class="l-join-grid">
+      <div class="l-reveal from-left">
+        <span class="l-eyebrow">Join Gamkers</span>
+        <h2>The future is <em>built together.</em></h2>
+        <p class="l-lead">Whether you're a student taking your first step into cybersecurity, a developer exploring new technologies, or a professional passionate about sharing knowledge — there is a place for you at Gamkers.</p>
+        <div class="l-btn-row">
+          <a class="l-btn l-btn-primary" href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer">{{ ic('discord') }} Join the Discord {{ ic('arrow') }}</a>
+          <a class="l-btn l-btn-ghost" href="#events">{{ ic('calendar') }} Find an event</a>
+        </div>
+        <div class="l-socials">
+          <a class="l-social" href="https://www.instagram.com/gamkers/" target="_blank" rel="noopener noreferrer"><span class="l-icon">{{ ic('instagram') }}</span><span><small>Instagram</small><b>@gamkers</b></span></a>
+          <a class="l-social" href="https://www.youtube.com/@gamkeryt/featured" target="_blank" rel="noopener noreferrer"><span class="l-icon">{{ ic('youtube') }}</span><span><small>YouTube</small><b>Gamkers</b></span></a>
+          <a class="l-social" href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><span class="l-icon">{{ ic('discord') }}</span><span><small>Discord</small><b>Community</b></span></a>
+        </div>
+      </div>
+      <div class="l-card l-join-card l-reveal from-right">
+        <span class="l-eyebrow">What you can do with us</span>
+        <ul class="l-ticks">
+          <li>{{ ic('check') }}Learn new cybersecurity and technology skills.</li>
+          <li>{{ ic('check') }}Participate in hands-on workshops and technical events.</li>
+          <li>{{ ic('check') }}Take on CTF competitions and challenges.</li>
+          <li>{{ ic('check') }}Collaborate on real-world projects.</li>
+          <li>{{ ic('check') }}Contribute to open-source initiatives.</li>
+          <li>{{ ic('check') }}Share your knowledge and become a contributor.</li>
+          <li>{{ ic('check') }}Connect with learners, developers and professionals.</li>
+        </ul>
+        <div class="end">{{ ic('zap') }} Be part of something bigger.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ═════════════════════════ FOOTER ═════════════════════════ #}
+<footer class="c-footer">
+  <div class="c-footer-inner">
+    <div class="c-footer-cols">
+      <div>
+        <div class="foot-brand"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></div>
+        <p>One community. Bigger impact.</p>
+        <p class="foot-motto">Learn. Build. Share. Grow.</p>
+      </div>
+      <div><h4>Explore</h4><div class="foot-links"><a href="#about">About</a><a href="#what-we-do">What we do</a><a href="#hardware">Hardware security</a><a href="#events">Events</a><a href="#team">Team</a></div></div>
+      <div><h4>Products</h4><div class="foot-links"><a href="{{ url_for('main.product_ghostchip') }}">GhostChip</a><a href="{{ url_for('main.product_phantom32') }}">Phantom32</a><a href="https://course.gamkers.in/" target="_blank" rel="noopener noreferrer">Bootcamp</a><a href="{{ url_for('certificates.verify_certificate') }}">Verify a certificate</a></div></div>
+      <div><h4>Connect</h4><div class="foot-links">
+        <a href="https://www.instagram.com/gamkers/" target="_blank" rel="noopener noreferrer">{{ ic('instagram') }}Instagram</a>
+        <a href="https://www.youtube.com/@gamkeryt/featured" target="_blank" rel="noopener noreferrer">{{ ic('youtube') }}YouTube</a>
+        <a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer">{{ ic('discord') }}Discord</a>
+        <a href="mailto:gamkers@gmail.com">{{ ic('mail') }}gamkers@gmail.com</a></div></div>
+    </div>
+    <div class="c-footer-bottom"><p>© {{ current_year }} Gamkers · gamkers.in</p><a class="foot-portal" href="{{ url_for('main.admin') }}">Admin →</a></div>
+  </div>
+</footer>
+</body>
+</html>

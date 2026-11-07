@@ -1,0 +1,53 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070907">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>Verify a certificate · GAMKERS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/event.css') }}">
+</head>
+<body>
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="c-nav-cta"><a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Join Community</button></a></div>
+  </div>
+</nav>
+
+<div class="ev-page">
+  <div class="cert-wrap narrow">
+    <span class="ev-status up">{{ ic('shield', 'ic-sm') }} Public records</span>
+    <h1 class="ev-title">Verify a certificate</h1>
+    <p class="cert-lead">Enter the certificate number printed on a GAMKERS certificate to confirm it is genuine. Verification stays available even after the PDF is removed.</p>
+    <form class="cert-search" method="get" action="{{ url_for('certificates.verify_certificate') }}">
+      <label class="sr-only" for="certificate-number">Certificate number</label>
+      <input id="certificate-number" name="number" maxlength="48" required value="{{ certificate_number }}" placeholder="CERT-2026-000001">
+      <button class="ev-register" type="submit">{{ ic('search') }} Verify</button>
+    </form>
+
+    {% if certificate %}
+      <div class="cert-result valid" role="status">
+        <div class="cert-result-head">{{ ic('check') }}<div><p>AUTHENTIC CERTIFICATE</p><h2>{{ batch.title }}</h2></div></div>
+        <dl>
+          <div><dt>Recipient</dt><dd>{{ certificate.recipient_name }}</dd></div>
+          <div><dt>Recipient's institution</dt><dd>{{ certificate.college_name }}</dd></div>
+          <div><dt>Issued by</dt><dd>GAMKERS</dd></div>
+          <div><dt>Certificate number</dt><dd>{{ certificate.certificate_number }}</dd></div>
+          <div><dt>Issued on</dt><dd>{{ certificate.created_at.strftime('%d %B %Y') }}</dd></div>
+        </dl>
+      </div>
+    {% elif searched %}
+      <div class="cert-result invalid" role="status">
+        <div class="cert-result-head">{{ ic('plus', 'x') }}<div><p>NOT FOUND</p><h2>No matching certificate</h2></div></div>
+        <p class="cert-lead">Check the certificate number and try again. No certificate record was found.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

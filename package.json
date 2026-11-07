@@ -1,0 +1,12 @@
+{
+  "name": "gamkers-portal",
+  "private": true,
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./tailwind/app.css -o ./app/static/css/app.css --minify",
+    "watch:css": "npx @tailwindcss/cli -i ./tailwind/app.css -o ./app/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

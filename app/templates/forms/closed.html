@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ form.title }} · Registration closed{% endblock %}
+{% block content %}
+<section class="submitted-wrap">
+  <span class="submitted-check">✓</span>
+  <p class="eyebrow">REGISTRATION CLOSED</p>
+  <h1>{{ form.title }}</h1>
+  <p class="closed-message">{{ form.closed_message }}</p>
+</section>
+{% endblock %}

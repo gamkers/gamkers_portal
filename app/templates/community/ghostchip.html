@@ -1,0 +1,177 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080a08">
+  <meta name="description" content="GhostChip — the world's first AI-powered BadUSB. ESP32-S3 USB platform with AI DuckyScript generation, Wi-Fi/BLE tooling and a full companion app.">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>GhostChip · World's First AI BadUSB · GAMKERS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <script src="{{ url_for('static', filename='js/community.js') }}" defer></script>
+</head>
+<body>
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="c-nav-links">
+      <a href="{{ url_for('main.home') }}#about">Community</a>
+      <a href="{{ url_for('main.home') }}#services">Services</a>
+      <a href="{{ url_for('main.home') }}#products">Products</a>
+      <a href="{{ url_for('main.home') }}#events">Events</a>
+    </div>
+    <div class="c-nav-cta"><a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Join Community</button></a></div>
+  </div>
+</nav>
+
+<div class="pdp">
+  <div class="pdp-bar">
+    <a class="pdp-back" href="{{ url_for('main.home') }}#products">← Products</a>
+    <span class="pdp-sep">|</span>
+    <span class="g-tag g-tag--accent">ESP32-S3 · AI BadUSB</span>
+    <span class="pdp-spacer"></span>
+    <button class="pdp-share" data-title="GhostChip — World's First AI-Powered BadUSB" type="button">{{ ic('link', 'ic-sm') }} <span class="pdp-share-label">Share</span></button>
+  </div>
+
+  <div class="pdp-wrap">
+    {# ── HERO ── #}
+    <div class="pdp-hero">
+      <div>
+        <div class="g-panel pdp-main"><img src="{{ url_for('static', filename='img/community/ghostchip/frontview.jpeg') }}" alt="GhostChip front view"></div>
+        <div class="pdp-thumbs">
+          {% set shots = [
+            ['ghostchip/frontview.jpeg','Front View'],
+            ['ghostchip/backview.jpeg','Back View'],
+            ['ghostchip/frontmarking.jpeg','Pin Marking (Front)'],
+            ['ghostchip/backmarking.jpeg','Pin Marking (Back)'],
+            ['ghostchip/inbuiltai.jpeg','Built-in AI Acceleration'],
+            ['ghostchip/realusecase.jpeg','Real Use Case'],
+            ['ghostchip/supports_all_os.jpeg','Cross-Platform Support']
+          ] %}
+          {% for s in shots %}
+          <button class="pdp-thumb {{ 'active' if loop.first }}" type="button" data-src="{{ url_for('static', filename='img/community/' + s[0]) }}" data-label="{{ s[1] }}"><img src="{{ url_for('static', filename='img/community/' + s[0]) }}" alt="{{ s[1] }}"></button>
+          {% endfor %}
+        </div>
+        <p class="pdp-caption">Front View</p>
+      </div>
+      <div class="pdp-copy">
+        <span class="wf-badge">{{ ic('globe', 'ic-sm') }} World's First AI-Powered BadUSB</span>
+        <h1 class="pdp-title">Ghost<span>Chip</span></h1>
+        <p class="pdp-subtitle">The Ultimate ESP32-S3 USB Development Platform</p>
+        <p class="pdp-para">GhostChip is the world's first BadUSB device with <strong>built-in AI script generation</strong>. Describe your payload in plain English — the AI writes, optimizes, and executes the DuckyScript automatically. Plug into any USB port and you're operational in seconds.</p>
+        <p class="pdp-para">Comes with a <strong class="plain">full companion app</strong> (Android APK + Web PWA) featuring a script editor, payload simulator, Wi-Fi/BLE scanner, live keyboard, NeoPixel control, and OTA firmware updates.</p>
+        <div class="pdp-cta-row">
+          <a href="https://store.gamkers.in/products/ghostchip" target="_blank" rel="noopener noreferrer"><button class="btn-solid">{{ ic('bag', 'ic-sm') }} Buy Now</button></a>
+          <a href="https://gamkers.github.io/GhostChipUI/" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Open Web App ›</button></a>
+        </div>
+        <div class="pdp-checks">
+          <span>{{ ic('check', 'ic-sm') }} AI-Powered</span><span>{{ ic('check', 'ic-sm') }} Plug &amp; Play</span><span>{{ ic('check', 'ic-sm') }} Android + Web App</span><span>{{ ic('check', 'ic-sm') }} Wi-Fi + BLE</span>
+        </div>
+      </div>
+    </div>
+
+    {# ── AI BANNER ── #}
+    <div class="ai-banner">
+      <div class="ai-glow"></div>
+      <span class="eyebrow">The AI Difference</span>
+      <h2>The World's First AI-Powered BadUSB Device</h2>
+      <p>Every BadUSB before GhostChip required you to write DuckyScript manually. GhostChip changes everything — just describe what you want to do in plain English, and the <strong>Llama 3.3 70B AI model</strong> generates the complete, optimized payload instantly. Supports Windows, macOS, and Linux targets. Even converts scripts between operating systems automatically.</p>
+      <div class="ai-mini-row">
+        <div class="ai-mini"><div class="t">Plain English → Script</div><div class="s">No DuckyScript knowledge needed</div></div>
+        <div class="ai-mini"><div class="t">Multi-OS Support</div><div class="s">Win, Mac, Linux auto-targeting</div></div>
+        <div class="ai-mini"><div class="t">Voice Input</div><div class="s">Speak your payload idea aloud</div></div>
+        <div class="ai-mini"><div class="t">OS Converter</div><div class="s">Convert any script to another OS</div></div>
+      </div>
+    </div>
+
+    {# ── APP FEATURES ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Companion App — 12 Powerful Tools</span>
+      <h2 class="section-title">One App. Total Control.</h2>
+      <p class="pdp-lead">Available as an Android APK and a Web PWA — works on any phone, tablet, or laptop. Connect over Wi-Fi and control GhostChip from anywhere.</p>
+      {% set feats = [
+        ['sparkles','AI DuckyScript Generator','WORLD FIRST',true,'Describe your payload in plain English — the on-device AI (Llama 3.3 70B via Groq) writes the DuckyScript automatically. Supports Windows, macOS, and Linux targets with OS-aware context.'],
+        ['mic','Voice-to-Script Input','UNIQUE',true,'Speak your payload idea and the AI transcribes and generates the DuckyScript. Hands-free script creation powered by the Web Speech API.'],
+        ['code','DuckyScript Editor','BUILT-IN',false,'Full-featured editor with syntax highlighting, line numbers, real-time character count, and auto-save. Load scripts from files or use built-in presets for Win/Mac/Linux.'],
+        ['puzzle','Visual Script Builder','NO-CODE',false,'Build payloads block-by-block without writing a single line. Commands for Delay, Type Text, Run CMD, PowerShell, Open URL, Download File, and more — with point-and-click UI.'],
+        ['play','Payload Simulator','SAFE TEST',false,'Preview exactly what your script will do before execution. Real-time keystroke simulation at adjustable speed (1×, 2×, 5×, 10×) with progress bar and command tracking.'],
+        ['keyboard','Live Keyboard','REAL-TIME',false,'Send individual keystrokes directly to the target in real time. Full keyboard layout with modifier keys (CTRL, ALT, SHIFT, GUI) and quick-action macros for Run Dialog, Spotlight, Terminal, Task Manager, and more.'],
+        ['wifi','WiFi Network Scanner','RECON',false,'Scan and display all nearby Wi-Fi networks with SSID, channel, RSSI signal strength, and encryption status. Sorted by signal strength with visual signal bars.'],
+        ['bluetooth','BLE Device Scanner','RECON',false,'Discover Bluetooth Low Energy devices in range. Displays device names, MAC addresses, signal strength, and flags Flipper Zero devices automatically.'],
+        ['shield','Deauth Detector','DEFENSIVE',false,'Passive 802.11 deauthentication attack detector. Monitors the air for deauth frames and alerts you in real time with attacker MAC, channel, and signal strength.'],
+        ['palette','NeoPixel Controller','HARDWARE',false,'Full RGB control of the onboard addressable NeoPixel LED. Set custom colors, brightness, and preset colors. Stealth mode or full status indication.'],
+        ['zap','OTA Firmware Update','WIRELESS',false,'Flash new firmware directly over Wi-Fi — no USB cable or programmer required. Drag and drop a .bin file and update instantly with progress tracking.'],
+        ['globe','WiFi Station Connect','NETWORK',false,'Connect GhostChip to any Wi-Fi network from the app. Scan, select a network, enter the password, and connect — all from your phone or browser.']
+      ] %}
+      <div class="feat-grid">
+        {% for f in feats %}
+        <div class="g-card feat-card">
+          <div class="feat-head"><span class="feat-icon">{{ ic(f[0]) }}</span><span class="feat-badge {{ 'hot' if f[3] }}">{{ f[2] }}</span></div>
+          <h3>{{ f[1] }}</h3>
+          <p>{{ f[4] }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── PRESETS ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Built-in Script Presets</span>
+      <h2 class="section-title">Ready-to-Run Payloads. <em>Out of the box.</em></h2>
+      {% set presets = [['WIN','Run Dialog'],['WIN','Terminal Admin'],['WIN','System Info'],['WIN','WiFi Passwords'],['MAC','Spotlight'],['MAC','Terminal'],['LNX','Terminal'],['LNX','Recon']] %}
+      <div class="preset-row">
+        {% for p in presets %}<div class="preset-chip"><span class="os">{{ p[0] }}</span><span class="nm">{{ p[1] }}</span></div>{% endfor %}
+        <div class="preset-more">+ AI generates unlimited more</div>
+      </div>
+    </div>
+
+    {# ── APP DOWNLOAD ── #}
+    <div class="pdp-block">
+      <div class="dl-grid">
+        <div class="g-card dl-card">
+          <div class="dl-icon">{{ ic('phone') }}</div>
+          <h3>Android App</h3>
+          <p>Download the native Android APK for the best mobile experience. Direct USB-over-WiFi control from your phone.</p>
+          <a href="https://gamkers.github.io/GhostChipUI/app-release-signed.apk" target="_blank" rel="noopener noreferrer"><button class="btn-solid">{{ ic('download', 'ic-sm') }} Download APK</button></a>
+        </div>
+        <div class="g-card dl-card">
+          <div class="dl-icon">{{ ic('globe') }}</div>
+          <h3>Web App (PWA)</h3>
+          <p>Works on any browser — iOS, macOS, Windows, Linux. Install as a PWA for an app-like experience without the App Store.</p>
+          <a href="https://gamkers.github.io/GhostChipUI/" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Open Web App ›</button></a>
+        </div>
+      </div>
+    </div>
+
+    {# ── SPECS ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Technical Specifications</span>
+      <h2 class="section-title">Under the <em>hood</em>.</h2>
+      {% set specs = [
+        ['Module','ESP32-S3-WROOM-1'],['Interface','USB-A (Male) — Plug & Play'],['Processor','Dual-core Xtensa LX7 @ 240MHz'],
+        ['AI Engine','Qwen 3.6 27B via OpenRouter API'],['Storage','MicroSD Card Reader (SPI)'],['LED','1× Addressable RGB NeoPixel'],
+        ['Button','1× GPIO User / Boot Button'],['Wireless','Wi-Fi 2.4GHz + BLE 5.0'],['Regulator','AMS1117 (5V → 3.3V LDO)'],
+        ['App Support','Android APK + Web PWA (iOS / Desktop)']
+      ] %}
+      <div class="g-panel spec-table">
+        {% for s in specs %}<div class="spec-row"><span class="spec-k">{{ s[0] }}</span><span class="spec-v">{{ s[1] }}</span></div>{% endfor %}
+      </div>
+    </div>
+
+    {# ── FINAL CTA ── #}
+    <div class="pdp-final">
+      <div class="pdp-final-glow"></div>
+      <span class="eyebrow">Get Yours Today</span>
+      <h2>Own the World's First <span>AI BadUSB</span></h2>
+      <p>GhostChip ships ready to use. Plug it in, connect to the app, and let AI write your payloads. No setup required. No DuckyScript knowledge needed.</p>
+      <div class="pdp-final-actions">
+        <a href="https://store.gamkers.in/products/ghostchip" target="_blank" rel="noopener noreferrer"><button class="btn-solid">{{ ic('bag', 'ic-sm') }} Buy Now</button></a>
+        <a href="{{ url_for('main.home') }}#products"><button class="btn-ghost">← View All Products</button></a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

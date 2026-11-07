@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Certificates · GAMKERS PORTAL{% endblock %}
+{% block content %}
+<section class="workspace-wrap">
+  <div class="workspace-heading">
+    <div><p class="eyebrow">YOUR WORKSPACE / CERTIFICATES</p><h1>Certificates that <span class="accent-text">last.</span></h1><p class="muted">Generate branded PDF certificates from feedback or an Excel/CSV recipient list.</p></div>
+  </div>
+  <form class="panel certificate-upload-panel" action="{{ url_for('certificates.upload_recipients') }}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div><p class="eyebrow">UPLOAD A RECIPIENT LIST</p><h2>Generate from CSV or Excel</h2><p class="muted">Upload a file with a name column and a college_name or institution column. CSV, XLSX and XLS supported; max {{ config['CERTIFICATE_MAX_RECORDS'] }} recipients per batch.</p></div>
+    <label class="field-label" for="recipient_file">Recipient file</label>
+    <input id="recipient_file" name="recipient_file" type="file" accept=".csv,.xlsx,.xls" required>
+    <button class="button button-primary" type="submit">Preview recipients <span>↗</span></button>
+  </form>
+  <div class="section-title-row"><div><p class="eyebrow">PERMANENT PUBLIC LINKS</p><h2>Generated batches</h2></div></div>
+  {% if batches %}
+    <div class="certificate-batch-list">
+      {% for batch in batches %}
+        <a class="certificate-batch-item" href="{{ url_for('certificates.batch_detail', batch_id=batch.id) }}">
+          <span class="form-list-icon">✳</span>
+          <span class="form-list-main"><strong>{{ batch.title }}</strong><span>{{ batch.generated_records }} certificates · {{ batch.created_at.strftime('%b %d, %Y') }}{% if batch.source_filename %} · {{ batch.source_filename }}{% endif %}</span></span>
+          <span class="badge {{ 'badge-live' if batch.status == 'completed' else 'badge-draft' }}">{{ batch.status|replace('_',' ')|title }}</span>
+          <span class="text-accent">View →</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state"><div class="empty-mark">✳</div><h3>No certificates yet.</h3><p>Close an event registration form to collect feedback, or upload a recipient spreadsheet above.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

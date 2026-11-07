@@ -1,0 +1,208 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+{% macro stars(score) -%}<span class="stars" aria-label="{{ score }} out of 5">{% for i in range(1, 6) %}{{ ic('star', 'on' if score and i <= score|round(0, 'common') else '') }}{% endfor %}</span>{%- endmacro %}
+{% macro form_fields(form) -%}
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {# Honeypot: invisible to people and screen readers; bots that fill it are dropped. #}
+  <div class="hp-field" aria-hidden="true"><label for="hp_website">Leave this field empty</label><input id="hp_website" name="hp_website" type="text" tabindex="-1" autocomplete="off"></div>
+  {% for question in form.questions %}
+    {% if question.type in ['choice', 'checkbox'] %}
+      <fieldset class="evt-field">
+        <legend>{{ question.title }}{% if question.required %} <span class="req" aria-label="required">*</span>{% endif %}</legend>
+        <div class="evt-choices">
+        {% for option in question.options %}
+          <label class="evt-choice"><input type="{{ 'radio' if question.type == 'choice' else 'checkbox' }}" name="{{ question.id }}" value="{{ option }}" {% if question.required and loop.first and question.type == 'choice' %}required{% endif %}><span>{{ option }}</span></label>
+        {% endfor %}
+        </div>
+      </fieldset>
+    {% else %}
+      <div class="evt-field">
+        <label class="q" for="q_{{ question.id }}">{{ question.title }}{% if question.required %} <span class="req" aria-label="required">*</span>{% endif %}</label>
+        {% if question.type == 'long_text' %}
+          <textarea id="q_{{ question.id }}" name="{{ question.id }}" rows="4" maxlength="5000" {% if question.required %}required{% endif %}></textarea>
+        {% else %}
+          <input id="q_{{ question.id }}" name="{{ question.id }}" type="{{ {'short_text':'text','email':'email','number':'number','date':'date'}[question.type] }}" maxlength="5000" {% if question.required %}required{% endif %}>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endfor %}
+{%- endmacro %}
+{% set cover = url_for('forms.public_form_banner', public_id=event.public_id) if event.banner_image_path else url_for('static', filename='img/community/photos/workshop.jpg') %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070907">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>{{ form.title }} · GAMKERS</title>
+  <meta name="description" content="{{ (event.description or event.title)[:160] }}">
+  <meta property="og:title" content="{{ form.title }}">
+  <meta property="og:description" content="{{ (event.description or event.title)[:160] }}">
+  <meta property="og:url" content="{{ page_url }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/event.css') }}">
+  <script src="{{ url_for('static', filename='js/community.js') }}" defer></script>
+</head>
+<body>
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="c-nav-links"><a href="{{ url_for('main.home') }}#events">Events</a><a href="{{ url_for('main.home') }}#past-events">Past events</a><a href="{{ url_for('main.home') }}#about">Community</a></div>
+    <div class="c-nav-cta"><a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Join Community</button></a></div>
+  </div>
+</nav>
+
+<div class="ev-page">
+  <img class="ev-backdrop" src="{{ cover }}" alt="">
+  <div class="ev-wrap">
+
+    {# ── Left column ── #}
+    <aside class="ev-side">
+      <div class="ev-cover"><img src="{{ cover }}" alt="{{ event.title }}"></div>
+      <div>
+        <h5>Hosted by</h5>
+        <div class="ev-host"><img src="{{ url_for('static', filename='img/logo.png') }}" alt=""> GAMKERS</div>
+      </div>
+      {% if registrations %}
+      <div>
+        <h5>{{ 'Attended' if mode == 'past' else 'Going' }}</h5>
+        <div class="ev-going"><b>{{ registrations }} {{ 'registered' if mode == 'past' else 'going' }}</b><span>{{ 'Thanks to everyone who joined.' if mode == 'past' else 'Join them — seats fill up fast.' }}</span></div>
+      </div>
+      {% endif %}
+      <div class="ev-side-links">
+        <a href="mailto:gamkers@gmail.com?subject={{ event.title|urlencode }}">{{ ic('mail') }} Contact the host</a>
+        <button class="pdp-share" type="button" data-title="{{ event.title }}">{{ ic('share') }} <span class="pdp-share-label">Share</span></button>
+        <a href="{{ url_for('main.home') }}#events">{{ ic('arrow-left') }} All events</a>
+      </div>
+      <div class="ev-tags"><span># Cybersecurity</span><span># Community</span>{% if event.event_location and 'online' in event.event_location|lower %}<span># Online</span>{% endif %}</div>
+    </aside>
+
+    {# ── Right column ── #}
+    <main>
+      {% if mode == 'upcoming' %}<span class="ev-status up"><span class="live-dot"></span> Registrations open</span>
+      {% elif mode == 'past' %}<span class="ev-status past">{{ ic('check', 'ic-sm') }} Event completed</span>
+      {% else %}<span class="ev-status fb">{{ ic('message', 'ic-sm') }} Share your feedback</span>{% endif %}
+      <h1 class="ev-title">{{ form.title }}</h1>
+
+      <div class="ev-rows">
+        {% if event.event_start_at %}
+        <div class="ev-row">
+          <span class="ev-tile"><span class="m">{{ event.event_start_at.strftime('%b') }}</span><span class="d">{{ event.event_start_at.strftime('%d')|int }}</span></span>
+          <div><b>{{ event.event_start_at.strftime('%A, %B') }} {{ event.event_start_at.strftime('%d')|int }}</b>
+            <span>{{ event.event_start_at.strftime('%I:%M %p').lstrip('0') }}{% if event.event_end_at %} – {{ event.event_end_at.strftime('%I:%M %p').lstrip('0') }}{% endif %} {{ tz_label }}</span></div>
+        </div>
+        {% endif %}
+        {% if event.event_location %}
+        <div class="ev-row">
+          <span class="ev-tile">{{ ic('pin') }}</span>
+          <div><b>{{ event.event_location }}</b>
+            {% if maps_url %}<a href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">Open in Google Maps {{ ic('arrow') }}</a>
+            {% elif event.event_url %}<a href="{{ event.event_url }}" target="_blank" rel="noopener noreferrer">Event link {{ ic('arrow') }}</a>{% endif %}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      {# Registration / status card #}
+      {% if mode == 'upcoming' %}
+        <div class="ev-card">
+          <div class="ev-card-head">Registration</div>
+          <div class="ev-card-body">
+            <p>Welcome! To join the event, please register below.</p>
+            <button class="ev-register" type="button" data-open-dialog="register">Register {{ ic('arrow') }}</button>
+            <div class="ev-sub-actions">
+              {% if calendar_url %}<a href="{{ calendar_url }}" target="_blank" rel="noopener noreferrer">{{ ic('calendar') }} Add to Google Calendar</a>{% endif %}
+              <button class="pdp-share" type="button" data-title="{{ event.title }}">{{ ic('link') }} <span class="pdp-share-label">Copy link</span></button>
+            </div>
+          </div>
+        </div>
+      {% elif mode == 'past' %}
+        <div class="ev-card">
+          <div class="ev-card-head">This event has ended</div>
+          <div class="ev-card-body">
+            <p>{{ event.closed_message or 'Thank you to everyone who joined us!' }}</p>
+            {# The feedback form link is shared privately with attendees, never on this public page. #}
+            <a class="ev-register" href="{{ url_for('main.home') }}#events">{{ ic('calendar') }} See upcoming events</a>
+          </div>
+        </div>
+      {% else %}
+        <div class="ev-card">
+          <div class="ev-card-head">Feedback for {{ event.title }}</div>
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          <form class="ev-form" method="post" data-submit-once>
+            {% if messages %}<div class="c-flash-stack">{% for category, message in messages %}<div class="c-flash c-flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+            {{ form_fields(form) }}
+            <button class="ev-register" type="submit">Submit feedback {{ ic('arrow') }}</button>
+            <p class="evt-privacy">Your response is shared with GAMKERS.</p>
+          </form>
+          {% endwith %}
+        </div>
+      {% endif %}
+
+      {% if event.description and mode != 'feedback' %}
+        <div class="ev-block">
+          <h3 class="ev-h">About Event</h3>
+          <div class="ev-about">{{ event.description }}</div>
+        </div>
+      {% endif %}
+
+      {# Past events: ratings + consented feedback #}
+      {% if mode == 'past' %}
+        <div class="ev-block" id="feedback">
+          <h3 class="ev-h">Attendee feedback</h3>
+          {% if feedback.count %}
+            <div class="ev-rating">
+              <div class="ev-score"><b>{{ feedback.average }}</b><small>/ 5</small>{{ stars(feedback.average) }}<p>{{ feedback.count }} rating{{ 's' if feedback.count != 1 }}</p></div>
+              <div class="ev-bars">
+                {% for row in feedback.distribution %}
+                <div class="ev-bar"><span>{{ row.label }}</span><i><em class="w-{{ (row.pct / 5)|round(0, 'common')|int * 5 }}"></em></i><span>{{ row.count }}</span></div>
+                {% endfor %}
+              </div>
+            </div>
+            {% if feedback.quotes %}
+              <div class="ev-quotes">
+                {% for q in feedback.quotes %}
+                <figure class="ev-quote">
+                  {% if q.rating %}{{ stars(q.rating) }}{% endif %}
+                  <p>“{{ q.text }}”</p>
+                  <footer><span class="av">{{ q.name[0] }}</span><div><b>{{ q.name }}</b>{% if q.org %}<span>{{ q.org }}</span>{% endif %}</div></footer>
+                </figure>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% else %}
+            <p class="ev-empty-note">No feedback yet.</p>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if event.event_location and mode != 'feedback' %}
+        <div class="ev-block ev-loc">
+          <h3 class="ev-h">Location</h3>
+          <b>{{ event.event_location }}</b>
+          {% if maps_url %}<a href="{{ maps_url }}" target="_blank" rel="noopener noreferrer">{{ ic('pin') }} View on Google Maps</a>{% endif %}
+        </div>
+      {% endif %}
+    </main>
+  </div>
+</div>
+
+{% if mode == 'upcoming' %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+<dialog class="ev-dialog" id="register" {% if messages and request.method == 'POST' %}data-autoopen{% endif %} aria-labelledby="register-title">
+  <div class="ev-dialog-head">
+    <img src="{{ cover }}" alt="">
+    <div><b id="register-title">{{ event.title }}</b>{% if event.event_start_at %}<span>{{ event.event_start_at.strftime('%a, %d %b · %I:%M %p') }} {{ tz_label }}</span>{% endif %}</div>
+    <button type="button" data-close-dialog aria-label="Close">{{ ic('plus') }}</button>
+  </div>
+  <form class="ev-form" method="post" data-submit-once>
+    {% if messages %}<div class="c-flash-stack">{% for category, message in messages %}<div class="c-flash c-flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {{ form_fields(form) }}
+    <button class="ev-register" type="submit">Request to join {{ ic('arrow') }}</button>
+    <p class="evt-privacy">Your details are shared with GAMKERS for this event only.</p>
+  </form>
+</dialog>
+{% endwith %}
+{% endif %}
+</body>
+</html>

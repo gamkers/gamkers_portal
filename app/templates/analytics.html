@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Analytics · GAMKERS ADMIN{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analytics.css') }}">
+<script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+{% endblock %}
+
+{% macro delta(value, period) -%}
+  {% if value is none %}<small class="an-delta">No data for the previous {{ period }}</small>
+  {% elif value > 0 %}<small class="an-delta up"><span aria-hidden="true">▲</span> {{ value }}% vs previous {{ period }}</small>
+  {% elif value < 0 %}<small class="an-delta down"><span aria-hidden="true">▼</span> {{ value|abs }}% vs previous {{ period }}</small>
+  {% else %}<small class="an-delta">No change vs previous {{ period }}</small>{% endif %}
+{%- endmacro %}
+
+{% macro bar_list(rows, empty, unit='registrations') -%}
+  {% if rows and rows|sum(attribute='count') %}
+    <ul class="an-bars">
+      {% for row in rows %}
+        <li class="an-bar-row" tabindex="0" data-tip-value="{{ row.count }}" data-tip-label="{{ row.label }} · {{ unit }}">
+          <span class="an-bar-label" title="{{ row.label }}">{{ row.label }}</span>
+          <svg class="an-bar-track" width="100%" height="8" aria-hidden="true" focusable="false">
+            {% if row.count %}<rect class="an-bar-fill {{ row.status or '' }}" x="0" y="0" width="{{ row.pct }}%" height="8" rx="4"/><rect class="an-bar-fill {{ row.status or '' }}" x="0" y="0" width="{{ (row.pct / 2)|round(1) }}%" height="8"/>{% endif %}
+          </svg>
+          <span class="an-bar-value">{{ row.count }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="an-empty">{{ empty }}</p>
+  {% endif %}
+{%- endmacro %}
+
+{% macro table_view(rows, label_title, value_title='Count') -%}
+  <details class="an-table-view">
+    <summary>View as table</summary>
+    <table class="an-table">
+      <thead><tr><th scope="col">{{ label_title }}</th><th scope="col" class="num">{{ value_title }}</th></tr></thead>
+      <tbody>{% for row in rows %}<tr><td>{{ row.label }}</td><td class="num">{{ row.count }}</td></tr>{% endfor %}</tbody>
+    </table>
+  </details>
+{%- endmacro %}
+
+{% block content %}
+{% set k = data.kpis %}
+{% set period = data.range_label|replace('Last ', '') %}
+<section class="workspace-wrap analytics">
+  <div class="workspace-heading">
+    <div>
+      <p class="eyebrow">GAMKERS ADMIN <span aria-hidden="true">/</span> ANALYTICS</p>
+      <h1>Analytics</h1>
+      <p class="muted">Registrations, attendees, feedback and certificates for {{ data.range_label|lower }} ({{ data.start.strftime('%b %d, %Y') }} – {{ data.now.strftime('%b %d, %Y') }}, UTC).</p>
+    </div>
+    <a class="button button-outline" href="{{ url_for('main.dashboard') }}">Back to workspace</a>
+  </div>
+
+  <nav class="an-filters" aria-label="Date range">
+    {% for value, label in data.ranges.items() %}
+      <a class="an-filter" href="{{ url_for('main.analytics', range=value) }}" {% if value == data.days %}aria-current="true"{% endif %}>
+        {% if value == data.days %}<svg class="an-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>{% endif %}{{ label }}
+      </a>
+    {% endfor %}
+  </nav>
+
+  <div class="an-kpis">
+    <div class="an-kpi an-kpi-hero">
+      <span class="an-kpi-label">Registrations</span>
+      <strong class="an-kpi-value">{{ '{:,}'.format(k.registrations) }}</strong>
+      {{ delta(k.registrations_delta, period) }}
+    </div>
+    <div class="an-kpi">
+      <span class="an-kpi-label">Unique attendees</span>
+      <strong class="an-kpi-value">{{ '{:,}'.format(k.attendees) }}</strong>
+      <small class="an-kpi-note">{{ k.returning }} returning (2+ events)</small>
+    </div>
+    <div class="an-kpi">
+      <span class="an-kpi-label">Events</span>
+      <strong class="an-kpi-value">{{ k.events_total }}</strong>
+      <small class="an-kpi-note">{{ k.events_open }} open · {{ k.events_completed }} completed</small>
+    </div>
+    <div class="an-kpi">
+      <span class="an-kpi-label">Average rating</span>
+      <strong class="an-kpi-value">{% if k.rating is not none %}{{ k.rating }}<span class="an-kpi-unit">/5</span>{% else %}—{% endif %}</strong>
+      <small class="an-kpi-note">{{ k.feedback }} feedback {{ 'response' if k.feedback == 1 else 'responses' }}</small>
+    </div>
+    <div class="an-kpi">
+      <span class="an-kpi-label">Certificates issued</span>
+      <strong class="an-kpi-value">{{ '{:,}'.format(k.certificates) }}</strong>
+      <small class="an-kpi-note">{{ '{:,}'.format(k.certificates_total) }} all time</small>
+    </div>
+    <div class="an-kpi">
+      <span class="an-kpi-label">Email delivery</span>
+      <strong class="an-kpi-value">{% if k.delivery_rate is not none %}{{ k.delivery_rate }}<span class="an-kpi-unit">%</span>{% else %}—{% endif %}</strong>
+      <small class="an-kpi-note">{{ k.emails_attempted }} confirmation {{ 'email' if k.emails_attempted == 1 else 'emails' }} attempted</small>
+    </div>
+  </div>
+
+  {% set chart = data.timeline_chart %}
+  <article class="an-card an-card-wide">
+    <header class="an-card-head">
+      <h2>Registrations over time</h2>
+      <p>{{ 'Per day' if data.days <= 30 else ('Per week' if data.days <= 90 else 'Per month') }} · event registrations only, feedback excluded</p>
+    </header>
+    {% if data.timeline_peak %}
+      <div class="an-chart-scroll">
+        <svg class="an-columns" viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img" aria-label="Column chart of registrations {{ data.range_label|lower }}. Full values in the table below.">
+          {% for tick in chart.ticks %}
+            <line class="{{ 'an-axis' if loop.first else 'an-grid' }}" x1="{{ chart.left }}" x2="{{ chart.right }}" y1="{{ tick.y }}" y2="{{ tick.y }}"/>
+            <text class="an-tick" x="{{ chart.left - 8 }}" y="{{ tick.y + 4 }}" text-anchor="end">{{ tick.value }}</text>
+          {% endfor %}
+          {% for col in chart.columns %}
+            <g class="an-col" tabindex="0" data-tip-value="{{ col.count }}" data-tip-label="{{ col.label }} · registrations">
+              <rect class="an-hit" x="{{ col.hit_x }}" y="0" width="{{ col.hit_w }}" height="{{ chart.baseline }}"/>
+              {% if col.path %}<path class="an-col-fill" d="{{ col.path }}"/>{% endif %}
+              {% if col.is_peak %}<text class="an-value" x="{{ col.label_x }}" y="{{ col.value_y }}" text-anchor="middle">{{ col.count }}</text>{% endif %}
+            </g>
+            {% if col.show_label %}<text class="an-tick" x="{{ col.label_x }}" y="{{ chart.label_y }}" text-anchor="middle">{{ col.label }}</text>{% endif %}
+          {% endfor %}
+        </svg>
+      </div>
+    {% else %}
+      <p class="an-empty">No registrations in {{ data.range_label|lower }}. Try a longer range.</p>
+    {% endif %}
+    {{ table_view(data.timeline, 'Period', 'Registrations') }}
+  </article>
+
+  <div class="an-grid">
+    <article class="an-card">
+      <header class="an-card-head"><h2>Registrations by event</h2><p>Top {{ data.by_event|length or '' }} events in this range</p></header>
+      {{ bar_list(data.by_event, 'No registrations in this range.') }}
+      {% if data.by_event %}{{ table_view(data.by_event, 'Event', 'Registrations') }}{% endif %}
+    </article>
+    <article class="an-card">
+      <header class="an-card-head"><h2>Top institutions</h2><p>From registration and feedback answers, one per person</p></header>
+      {{ bar_list(data.institutions, 'No institution answers in this range.', 'people') }}
+      {% if data.institutions %}{{ table_view(data.institutions, 'Institution', 'People') }}{% endif %}
+    </article>
+    <article class="an-card">
+      <header class="an-card-head"><h2>Feedback ratings</h2><p>{{ k.feedback }} {{ 'response' if k.feedback == 1 else 'responses' }} in this range</p></header>
+      {{ bar_list(data.ratings, 'No feedback in this range.', 'responses') }}
+      {% if k.feedback %}{{ table_view(data.ratings, 'Rating', 'Responses') }}{% endif %}
+    </article>
+    <article class="an-card">
+      <header class="an-card-head"><h2>Confirmation emails</h2><p>Status of registration confirmations</p></header>
+      {% if data.email_total %}
+        <ul class="an-status-list">
+          {% for row in data.email_rows %}
+            <li class="an-bar-row" tabindex="0" data-tip-value="{{ row.count }}" data-tip-label="{{ row.label }} · {{ row.pct }}%">
+              <span class="an-bar-label"><span class="an-status-dot {{ row.status }}" aria-hidden="true">{% if row.status == 'good' %}✓{% elif row.status == 'critical' %}✕{% else %}!{% endif %}</span>{{ row.label }}</span>
+              <svg class="an-bar-track" width="100%" height="8" aria-hidden="true" focusable="false">
+                {% if row.count %}<rect class="an-bar-fill {{ row.status }}" x="0" y="0" width="{{ row.pct }}%" height="8" rx="4"/><rect class="an-bar-fill {{ row.status }}" x="0" y="0" width="{{ (row.pct / 2)|round(1) }}%" height="8"/>{% endif %}
+              </svg>
+              <span class="an-bar-value">{{ row.count }} <span class="an-muted">· {{ row.pct }}%</span></span>
+            </li>
+          {% endfor %}
+        </ul>
+        {{ table_view(data.email_rows, 'Status', 'Emails') }}
+      {% else %}
+        <p class="an-empty">No confirmation emails in this range.</p>
+      {% endif %}
+    </article>
+  </div>
+
+  <article class="an-card an-card-wide">
+    <header class="an-card-head"><h2>Event performance</h2><p>All-time totals per event; “In range” counts registrations from {{ data.range_label|lower }}</p></header>
+    {% if data.event_rows %}
+      <div class="an-table-scroll">
+        <table class="an-table an-table-events">
+          <thead>
+            <tr>
+              <th scope="col">Event</th><th scope="col">Status</th><th scope="col">Date</th>
+              <th scope="col" class="num">Registrations</th><th scope="col" class="num">In range</th>
+              <th scope="col" class="num">Feedback</th><th scope="col" class="num">Response rate</th>
+              <th scope="col" class="num">Avg rating</th><th scope="col" class="num">Certificates</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data.event_rows %}
+              <tr>
+                <th scope="row"><a href="{{ url_for('forms.responses', form_id=row.form.id) }}">{{ row.form.title }}</a></th>
+                <td><span class="badge {{ 'badge-live' if row.state == 'Open' else 'badge-draft' }}">{{ row.state }}</span></td>
+                <td>{{ row.date.strftime('%b %d, %Y') if row.date else '—' }}</td>
+                <td class="num">{{ row.registrations }}</td>
+                <td class="num">{{ row.in_range }}</td>
+                <td class="num">{{ row.feedback }}</td>
+                <td class="num">{{ '%d%%'|format(row.response_rate) if row.response_rate is not none else '—' }}</td>
+                <td class="num">{{ row.rating if row.rating is not none else '—' }}</td>
+                <td class="num">{{ row.certificates }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="an-empty">No events yet.</p>
+    {% endif %}
+  </article>
+  <div class="an-tooltip" role="status" hidden><strong class="an-tooltip-value"></strong><span class="an-tooltip-label"></span></div>
+</section>
+{% endblock %}

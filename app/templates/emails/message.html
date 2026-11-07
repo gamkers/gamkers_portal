@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="mail-page">
+    <table class="mail-background" role="presentation" width="100%" cellspacing="0" cellpadding="0">
+      <tr>
+        <td align="center" class="mail-background-cell">
+          <table class="mail-card" role="presentation" width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="mail-accent"></td>
+            </tr>
+            <tr>
+              <td class="mail-header">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td class="mail-logo-cell" width="54">
+                      <img class="mail-logo" src="cid:gamkers-portal-logo" width="42" height="42" alt="GAMKERS logo">
+                    </td>
+                    <td>
+                      <p class="mail-brand">GAMKERS <span>PORTAL</span></p>
+                      <p class="mail-brand-caption">India's Largest Growing CYBER SECURITY Community.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="mail-body">
+                <p class="mail-eyebrow">MESSAGE FROM {{ organization_name }}</p>
+                <h1 class="mail-title">{{ subject }}</h1>
+                <div class="mail-copy">{{ message_html }}</div>
+                {% if event_details %}
+                  <div class="mail-event">
+                    <p class="mail-event-label">EVENT DETAILS</p>
+                    <p class="mail-event-title">{{ event_title }}</p>
+                    {% if event_details.date %}
+                      <p class="mail-event-row"><strong>DATE &amp; TIME</strong>{{ event_details.date }} &middot; {{ event_details.start_time }}{% if event_details.end_time %}&ndash;{{ event_details.end_time }}{% endif %} {{ event_details.timezone_label }} <span>({{ event_details.timezone }})</span></p>
+                    {% endif %}
+                    {% if event_details.location %}<p class="mail-event-row"><strong>LOCATION</strong>{{ event_details.location }}</p>{% endif %}
+                    <div class="mail-actions">
+                      {% if event_url %}<a class="mail-action" href="{{ event_url }}">View event details</a>{% endif %}
+                      {% if calendar_url %}<a class="mail-calendar-link" href="{{ calendar_url }}">Add to Google Calendar</a>{% endif %}
+                    </div>
+                    {% if calendar_url %}<p class="mail-event-note">A calendar invitation is also attached. Times are shown in {{ event_details.timezone }}.</p>{% endif %}
+                  </div>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td class="mail-footer">
+                <p class="mail-footer-brand">GAMKERS PORTAL</p>
+                <p class="mail-footer-copy">India's Largest Growing CYBER SECURITY Community.</p>
+                <p class="mail-footer-note">You are receiving this message from {{ organization_name }}.</p>
+              </td>
+            </tr>
+          </table>
+          <p class="mail-outside-note">GAMKERS PORTAL &middot; TEAM COMMUNICATION</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

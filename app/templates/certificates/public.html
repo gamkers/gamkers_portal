@@ -1,0 +1,52 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070907">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>Certificate {{ certificate.certificate_number }} · GAMKERS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/event.css') }}">
+</head>
+<body>
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="c-nav-cta"><a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Join Community</button></a></div>
+  </div>
+</nav>
+
+<div class="ev-page">
+  <div class="cert-wrap">
+    <div class="cert-head">
+      <span class="ev-status up">{{ ic('shield', 'ic-sm') }} Official digital certificate</span>
+      <h1 class="ev-title">{{ batch.title }}</h1>
+      <div class="cert-meta">
+        <div><span class="lbl">Awarded to</span><b>{{ certificate.recipient_name }}</b>{% if certificate.college_name %}<span class="sub">{{ certificate.college_name }}</span>{% endif %}</div>
+        <div><span class="lbl">Issued by</span><b class="cert-issuer"><img src="{{ url_for('static', filename='img/logo.png') }}" alt=""> GAMKERS</b><span class="sub">on {{ certificate.created_at.strftime('%d %B %Y') }}</span></div>
+        <div><span class="lbl">Certificate number</span><b>{{ certificate.certificate_number }}</b><span class="sub">Permanently verifiable</span></div>
+      </div>
+    </div>
+
+    {% if pdf_available %}
+      <div class="cert-frame">
+        <iframe src="{{ url_for('certificates.public_certificate_pdf', token=certificate.public_token) }}#toolbar=0&amp;navpanes=0&amp;view=Fit" title="Certificate preview for {{ certificate.recipient_name }}"></iframe>
+      </div>
+      <div class="cert-actions">
+        <a class="ev-register" href="{{ url_for('certificates.download_public_certificate', token=certificate.public_token) }}">{{ ic('download') }} Download your certificate</a>
+        <a class="ev-done-ghost" href="{{ url_for('certificates.verify_certificate', number=certificate.certificate_number) }}">{{ ic('shield') }} Verify certificate details</a>
+      </div>
+      <p class="cert-note">The PDF is available until {{ certificate.pdf_expires_at.strftime('%d %B %Y') if certificate.pdf_expires_at else 'further notice' }}. Verification details remain available permanently.</p>
+    {% else %}
+      <div class="ev-card"><div class="ev-card-body">
+        <p>The PDF download period has ended. The certificate record remains available for verification.</p>
+        <a class="ev-register" href="{{ url_for('certificates.verify_certificate', number=certificate.certificate_number) }}">{{ ic('shield') }} Verify certificate details</a>
+      </div></div>
+    {% endif %}
+  </div>
+</div>
+</body>
+</html>

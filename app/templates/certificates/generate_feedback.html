@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Generate event certificates · GAMKERS PORTAL{% endblock %}
+{% block content %}
+<section class="workspace-wrap">
+  <a class="back-link" href="{{ url_for('forms.edit_form', form_id=event_form.id) }}">← Closed event form</a>
+  <p class="eyebrow">EVENT CERTIFICATES</p><h1>{{ event_form.title }}</h1>
+  <p class="muted">Use completed feedback responses as the certificate recipient list. Each response can receive only one certificate.</p>
+  <div class="stat-grid certificate-stats">
+    <div class="stat-card"><span>ELIGIBLE FEEDBACK RESPONSES</span><strong>{{ eligible_count }}</strong><small>With a name, institution and email</small></div>
+    <div class="stat-card"><span>ALREADY CERTIFIED</span><strong>{{ issued_count }}</strong><small>Certificate links remain available</small></div>
+    <div class="stat-card"><span>FEEDBACK FORM</span><strong>{{ 'Closed' if feedback_form.closed_at else 'Open' }}</strong><small>{{ feedback_form.title }}</small></div>
+  </div>
+  <form class="panel certificate-generate-panel" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p class="eyebrow">CERTIFICATE DETAILS</p>
+    <label class="field-label" for="title">Certificate title</label><input id="title" name="title" maxlength="180" required value="{{ request.form.get('title', default_title) }}">
+    <label class="field-label" for="description">Certificate description</label><textarea id="description" name="description" rows="4" maxlength="5000" required>{{ request.form.get('description', 'This certificate is awarded to {name} from {college_name} for participating in ' ~ event_form.title ~ '. Certificate number: {certificate_number}.') }}</textarea>
+    <p class="security-note">Personalise text with {name}, {college_name}, {certificate_number}, and {date}. PDF files stay in private storage and are deleted after 30 days; certificate verification records remain available permanently.</p>
+    <button class="button button-primary" type="submit" {% if not eligible_count %}disabled{% endif %}>Generate {{ eligible_count }} certificates <span>↗</span></button>
+  </form>
+</section>
+{% endblock %}

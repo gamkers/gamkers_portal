@@ -1,0 +1,155 @@
+{% macro ic(name, cls='') -%}<svg class="ic {{ cls }}" aria-hidden="true"><use href="#i-{{ name }}"/></svg>{%- endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080a08">
+  <meta name="description" content="Phantom32 — the ultimate handheld wireless & Sub-GHz field tool. ESP32-S3 with CC1101, Wi-Fi, BLE, IR, HID, OLED, LiPo and GPIO expansion.">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>Phantom32 · Handheld Field Tool · GAMKERS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <script src="{{ url_for('static', filename='js/community.js') }}" defer></script>
+</head>
+<body>
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="c-nav-links">
+      <a href="{{ url_for('main.home') }}#about">Community</a>
+      <a href="{{ url_for('main.home') }}#services">Services</a>
+      <a href="{{ url_for('main.home') }}#products">Products</a>
+      <a href="{{ url_for('main.home') }}#events">Events</a>
+    </div>
+    <div class="c-nav-cta"><a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Join Community</button></a></div>
+  </div>
+</nav>
+
+<div class="pdp">
+  <div class="pdp-bar">
+    <a class="pdp-back" href="{{ url_for('main.home') }}#products">← Back to Products</a>
+    <span class="pdp-sep">|</span>
+    <span class="g-tag g-tag--accent">Flagship Handheld Tool</span>
+    <span class="pdp-spacer"></span>
+    <button class="pdp-share" data-title="Phantom32 — Gamkers Hardware" type="button">{{ ic('link', 'ic-sm') }} <span class="pdp-share-label">Share</span></button>
+  </div>
+
+  <div class="pdp-wrap">
+    {# ── HERO ── #}
+    <div class="pdp-hero">
+      <div>
+        <div class="g-panel pdp-main"><img src="{{ url_for('static', filename='img/community/phantom/front.jpeg') }}" alt="Phantom32 front view"></div>
+        <div class="pdp-thumbs">
+          {% set shots = [
+            ['phantom/front.jpeg','Front View'],
+            ['phantom/back.jpeg','Back View'],
+            ['phantom/frontmarking.jpeg','Pin Marking (Front)'],
+            ['phantom/backmarking.jpeg','Pin Marking (Back)'],
+            ['phantom/ir.jpeg','IR Transmitter & Receiver'],
+            ['phantom/subghz.jpeg','Sub-GHz CC1101 Module'],
+            ['phantom/usbrubberducky.jpeg','USB Rubber Ducky / HID'],
+            ['phantom/wifible.jpeg','Wi-Fi & BLE']
+          ] %}
+          {% for s in shots %}
+          <button class="pdp-thumb {{ 'active' if loop.first }}" type="button" data-src="{{ url_for('static', filename='img/community/' + s[0]) }}" data-label="{{ s[1] }}"><img src="{{ url_for('static', filename='img/community/' + s[0]) }}" alt="{{ s[1] }}"></button>
+          {% endfor %}
+        </div>
+        <p class="pdp-caption">Front View</p>
+      </div>
+      <div class="pdp-copy">
+        <span class="eyebrow">GAMKERS Hardware</span>
+        <h1 class="pdp-title">Phantom<span>32</span></h1>
+        <p class="pdp-subtitle">The Ultimate Handheld Wireless &amp; Sub-GHz Field Tool</p>
+        <p class="pdp-para">An all-in-one handheld development and security research platform designed for hardware hackers, radio enthusiasts, and cybersecurity professionals. Powered by the high-performance ESP32-S3, it combines multiple wireless technologies into a single compact device.</p>
+        <p class="pdp-para">From capturing and analyzing sub-GHz signals to performing advanced Wi-Fi and Bluetooth testing, Phantom32 acts as a versatile field tool built for exploration, research, and development.</p>
+        <div class="pdp-cta-row">
+          <a href="https://shop.gamkers.in/products/phantom32" target="_blank" rel="noopener noreferrer"><button class="btn-solid">{{ ic('bag', 'ic-sm') }} Buy Now</button></a>
+          <a href="https://discord.gg/9MWjDM3cTy" target="_blank" rel="noopener noreferrer"><button class="btn-ghost">Ask Community</button></a>
+        </div>
+        <div class="pdp-checks">
+          <span>{{ ic('check', 'ic-sm') }} Sub-GHz CC1101</span><span>{{ ic('check', 'ic-sm') }} OLED + Nav Pad</span><span>{{ ic('check', 'ic-sm') }} LiPo + USB-C</span>
+        </div>
+      </div>
+    </div>
+
+    {# ── CORE PROTOCOL SUPPORT ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Core Protocol Support</span>
+      <h2 class="section-title">Every wireless protocol. <em>One device.</em></h2>
+      {% set protocols = [
+        ['radio','Sub-GHz Communication','Equipped with a CC1101 transceiver and SMA antenna, Phantom32 can receive and analyze sub-GHz signals commonly used in remote systems and wireless sensors.'],
+        ['wifi','Wi-Fi & Bluetooth LE','Leverages the ESP32-S3 dual-core processor for wireless communication, IoT development, and controlled security testing scenarios.'],
+        ['target','Infrared Capability','Built-in IR transmitter and receiver allow Phantom32 to interact with and replicate infrared signals, enabling use as a universal remote.'],
+        ['keyboard','HID Interaction','Supports USB-based Human Interface Device functionality for automation, testing, and development of input-based interactions.']
+      ] %}
+      <div class="feat-grid">
+        {% for p in protocols %}
+        <div class="g-card feat-card feat-row"><span class="feat-icon">{{ ic(p[0]) }}</span><div><h3>{{ p[1] }}</h3><p>{{ p[2] }}</p></div></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── HARDWARE & UI ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Hardware &amp; User Interface</span>
+      <h2 class="section-title">Built for the <em>field</em>.</h2>
+      {% set hardware = [
+        ['gamepad','Standalone Operation','Features a 5-way navigation pad, dedicated back and boot button, and an OLED display for a complete menu-driven experience without requiring a computer.'],
+        ['battery','Portable Power','Includes a built-in LiPo battery with USB-C charging, making it suitable for field use and on-the-go experimentation.'],
+        ['bulb','Visual Indicators','An addressable RGB LED and battery indicators provide real-time feedback on device status and activity.'],
+        ['storage','Storage Support','Integrated MicroSD card slot for storing captured data, scripts, and configuration files.']
+      ] %}
+      <div class="feat-grid cols-4">
+        {% for h in hardware %}
+        <div class="g-card feat-card"><span class="feat-icon">{{ ic(h[0]) }}</span><h3>{{ h[1] }}</h3><p>{{ h[2] }}</p></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── EXPANDABILITY ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Expandability &amp; Development</span>
+      <h2 class="section-title">Expand your <em>capability</em>.</h2>
+      {% set expansion = [
+        ['wrench','GPIO Expansion','A 20-pin GPIO header allows integration with sensors, modules, and external hardware for custom projects.'],
+        ['network','NRF24 Support','Dedicated interface for adding NRF24 modules to enable extended 2.4GHz communication and experimentation.'],
+        ['antenna','Dual Antenna Design','Separate SMA connectors for sub-GHz and 2.4GHz frequencies ensure improved signal performance and flexibility.']
+      ] %}
+      <div class="feat-grid">
+        {% for e in expansion %}
+        <div class="g-card feat-card"><span class="feat-icon">{{ ic(e[0]) }}</span><h3>{{ e[1] }}</h3><p>{{ e[2] }}</p></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── SPECS ── #}
+    <div class="pdp-block">
+      <span class="eyebrow">Technical Specifications</span>
+      <h2 class="section-title">Under the <em>hood</em>.</h2>
+      {% set specs = [
+        ['Processor','ESP32-S3 Dual-core Xtensa LX7 + AI Acceleration'],['Radio Module','CC1101 Sub-GHz Transceiver'],
+        ['Display','0.96-inch OLED'],['Connectivity','USB-C, Wi-Fi, BLE, Sub-GHz, Infrared'],
+        ['Expansion','20-pin GPIO Header + NRF24 Module Support'],['Battery','Rechargeable LiPo with USB-C Charging'],
+        ['Navigation','5-way Nav Pad + Back + Boot Button'],['Indicators','Addressable RGB LED + Battery LEDs']
+      ] %}
+      <div class="g-panel spec-table">
+        {% for s in specs %}<div class="spec-row"><span class="spec-k">{{ s[0] }}</span><span class="spec-v">{{ s[1] }}</span></div>{% endfor %}
+      </div>
+    </div>
+
+    {# ── FINAL CTA ── #}
+    <div class="pdp-final">
+      <div class="pdp-final-glow"></div>
+      <span class="eyebrow">Get Yours Today</span>
+      <h2>Ready to own a <span>Phantom32</span>?</h2>
+      <p>Phantom32 brings powerful wireless capabilities into a single handheld device — enabling you to capture, analyze, and interact with signals in a controlled and responsible development environment.</p>
+      <div class="pdp-final-actions">
+        <a href="https://shop.gamkers.in/products/phantom32" target="_blank" rel="noopener noreferrer"><button class="btn-solid">{{ ic('bag', 'ic-sm') }} Buy Now</button></a>
+        <a href="{{ url_for('main.home') }}#products"><button class="btn-ghost">← View All Products</button></a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

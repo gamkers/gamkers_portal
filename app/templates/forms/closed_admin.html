@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Form closed · {{ form.title }}{% endblock %}
+{% block content %}
+<section class="workspace-wrap">
+  <div class="editor-heading">
+    <div><a class="back-link" href="{{ url_for('main.dashboard') }}">← Workspace</a><p class="eyebrow">FORM CLOSED</p><h1>{{ form.title }}</h1></div>
+    <span class="badge badge-draft">Closed {{ form.closed_at.strftime('%b %d, %Y') }}</span>
+  </div>
+  <div class="panel closed-admin-card">
+    <p class="eyebrow">CLOSURE MESSAGE</p><p class="closed-message">{{ form.closed_message }}</p>
+    {% if parent_form %}
+      <a class="button button-outline" href="{{ url_for('forms.edit_form', form_id=parent_form.id) }}">View event form</a>
+    {% elif feedback_form %}
+      <p class="muted">Your feedback form is published. Share the link below with attendees.</p>
+      <div class="public-link-row"><input readonly value="{{ feedback_url }}" aria-label="Feedback form URL"><button class="button button-outline button-small" type="button" data-copy-link>Copy link</button></div>
+      <div class="closed-admin-actions">
+        {% if current_user.has_permission('responses.view') %}<a class="button button-outline" href="{{ url_for('forms.responses', form_id=feedback_form.id) }}">Feedback responses</a>{% endif %}
+        {% if current_user.has_permission('certificates.manage') %}<a class="button button-primary" href="{{ url_for('certificates.generate_from_feedback', form_id=form.id) }}">Generate certificates ↗</a>{% endif %}
+      </div>
+    {% endif %}
+    <p class="muted">Public form: <a class="text-accent" target="_blank" rel="noopener" href="{{ url_for('forms.public_form', public_id=form.public_id) }}">Open closed form ↗</a></p>
+  </div>
+</section>
+{% endblock %}
