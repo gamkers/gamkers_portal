@@ -1,0 +1,53 @@
+{% extends 'team_profiles/_layout.html' %}
+{% from 'team_profiles/_ic.html' import ic %}
+{% block title %}{{ profile.name }} · {{ profile.role_title }} · GAMKERS Team{% endblock %}
+{% block meta %}
+  {% set summary = profile.name ~ ' is a verified member of the GAMKERS team (' ~ profile.role_title ~ ', team ID ' ~ profile.team_id ~ ').' %}
+  <meta name="description" content="{{ summary }}">
+  <link rel="canonical" href="{{ public_url }}">
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="GAMKERS">
+  <meta property="og:title" content="{{ profile.name }} · {{ profile.role_title }} · GAMKERS Team">
+  <meta property="og:description" content="{{ summary }}">
+  <meta property="og:url" content="{{ public_url }}">
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}"><meta name="twitter:card" content="summary">{% endif %}
+{% endblock %}
+{% block content %}
+<article class="tm-public">
+  <div class="tm-profile">
+    <div class="tm-profile-glow" aria-hidden="true"></div>
+    <span class="tm-verified">{{ ic('check', 'ic-sm') }} Verified GAMKERS team member</span>
+    <div class="tm-photo tm-photo-xl">
+      {% if photo_url %}<img src="{{ photo_url }}" alt="Photo of {{ profile.name }}">{% else %}<span class="tm-photo-empty tm-initial">{{ profile.name[:1]|upper }}</span>{% endif %}
+    </div>
+    <h1 class="tm-profile-name">{{ profile.name }}</h1>
+    <p class="tm-profile-role">{{ profile.role_title }}</p>
+
+    <dl class="tm-facts">
+      <div><dt>Team ID</dt><dd class="tm-mono">{{ profile.team_id }}</dd></div>
+      <div><dt>Member since</dt><dd>{{ (profile.joined_at or profile.created_at).strftime('%B %Y') }}</dd></div>
+      <div><dt>Status</dt><dd class="tm-active">{{ ic('check', 'ic-sm') }} Active</dd></div>
+    </dl>
+
+    {% if profile.bio %}<p class="tm-bio">{{ profile.bio }}</p>{% endif %}
+
+    {% if links %}
+      <ul class="tm-links">
+        {% for link in links %}
+          <li><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ ic(link.icon, 'ic-sm') }} {{ link.label }}</a></li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <div class="tm-profile-actions">
+      <button class="tm-btn tm-btn-inline" type="button" data-copy="{{ public_url }}" data-share-title="{{ profile.name }} · GAMKERS Team">{{ ic('share', 'ic-sm') }} <span data-copy-label>Share profile</span></button>
+      {% if is_owner %}<a class="tm-btn-ghost" href="{{ url_for('team_profiles.portal') }}">{{ ic('user', 'ic-sm') }} Edit my profile</a>{% endif %}
+    </div>
+  </div>
+
+  <aside class="tm-proof">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="">
+    <p><b>Issued by GAMKERS.</b> This page is hosted on the official GAMKERS site. It stays live only while {{ profile.team_id }} is an active team ID — if this person leaves the team, it shows as inactive.</p>
+  </aside>
+</article>
+{% endblock %}

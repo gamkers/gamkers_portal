@@ -1,0 +1,20 @@
+{% extends 'team_profiles/_layout.html' %}
+{% from 'team_profiles/_ic.html' import ic %}
+{% block title %}{{ 'Welcome to the team' if purpose == 'invite' else 'Sign in' }} · GAMKERS Team{% endblock %}
+{% block content %}
+<section class="tm-auth">
+  {% if purpose == 'invite' %}
+    <span class="tm-pill">{{ ic('sparkles', 'ic-sm') }} You're invited</span>
+    <h1>Welcome to the GAMKERS team{% if profile.name %}, {{ profile.name.split(' ')[0] }}{% endif %}</h1>
+    <p class="tm-lead">Your team ID is reserved. Continue to add your photo, role and social profiles — then share your verified profile page.</p>
+    <div class="tm-id-chip">{{ ic('shield', 'ic-sm') }} {{ profile.team_id }}</div>
+  {% else %}
+    <h1>Sign in to the team portal</h1>
+    <p class="tm-lead">Continue as <b>{{ profile.email }}</b>.</p>
+  {% endif %}
+  <form class="tm-form-inline" method="post" data-submit-once>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="tm-btn tm-btn-inline" type="submit">{{ 'Set up my profile' if purpose == 'invite' else 'Continue' }} {{ ic('arrow', 'ic-sm') }}</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'team_profiles/_layout.html' %}
+{% from 'team_profiles/_ic.html' import ic %}
+{% block title %}Link expired · GAMKERS Team{% endblock %}
+{% block content %}
+<section class="tm-auth">
+  <div class="tm-auth-icon tm-auth-icon-warn">{{ ic('clock') }}</div>
+  <h1>This link has expired</h1>
+  <p class="tm-lead">Sign-in and invitation links work once and expire after a while. Request a fresh sign-in link with your team email.</p>
+  <a class="tm-btn tm-btn-inline" href="{{ url_for('team_profiles.login') }}">{{ ic('mail', 'ic-sm') }} Get a new sign-in link</a>
+</section>
+{% endblock %}

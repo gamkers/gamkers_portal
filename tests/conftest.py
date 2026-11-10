@@ -22,6 +22,7 @@ def app(tmp_path):
             "CERTIFICATE_STORAGE_PATH": str(tmp_path / "certificates"),
             "CERTIFICATE_UPLOAD_PATH": str(tmp_path / "certificate-uploads"),
             "FORM_BANNER_STORAGE_PATH": str(tmp_path / "form-banners"),
+            "TEAM_PHOTO_STORAGE_PATH": str(tmp_path / "team-photos"),
             "WTF_CSRF_ENABLED": False,
             "RATELIMIT_ENABLED": False,
             "SMTP_ENCRYPTION_KEY": None,

@@ -86,7 +86,7 @@ def email_settings():
     return render_template("organization/email_settings.html", organization=org)
 
 
-@organization.route("/team", methods=["GET", "POST"])
+@organization.route("/settings/team", methods=["GET", "POST"])
 @login_required
 @limiter.limit("10 per hour", methods=["POST"])
 def team():
@@ -161,7 +161,7 @@ def team():
     )
 
 
-@organization.post("/team/<int:user_id>/role")
+@organization.post("/settings/team/<int:user_id>/role")
 @login_required
 def update_role(user_id):
     denied = require_admin()
@@ -183,7 +183,7 @@ def update_role(user_id):
     return redirect(url_for("organization.team"))
 
 
-@organization.post("/team/permissions")
+@organization.post("/settings/team/permissions")
 @login_required
 def update_permissions():
     denied = require_admin()

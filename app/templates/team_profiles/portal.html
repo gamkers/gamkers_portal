@@ -1,0 +1,83 @@
+{% extends 'team_profiles/_layout.html' %}
+{% from 'team_profiles/_ic.html' import ic %}
+{% block title %}My team profile · GAMKERS{% endblock %}
+{% block nav_right %}
+  <span class="tm-nav-who">{{ profile.team_id }}</span>
+  <form method="post" action="{{ url_for('team_profiles.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="tm-nav-link" type="submit">Sign out</button></form>
+{% endblock %}
+{% block content %}
+<div class="tm-portal">
+  <header class="tm-portal-head">
+    <span class="tm-pill">{{ ic('users', 'ic-sm') }} GAMKERS team portal</span>
+    <h1>Your team profile</h1>
+    <p class="tm-lead">This is what people see when you share your GAMKERS team link.</p>
+  </header>
+
+  <div class="tm-portal-grid">
+    <aside class="tm-preview">
+      <div class="tm-idcard">
+        <div class="tm-idcard-top"><img src="{{ url_for('static', filename='img/logo.png') }}" alt=""> GAMKERS <span>TEAM</span></div>
+        <div class="tm-photo tm-photo-lg">
+          {% if photo_url %}<img src="{{ photo_url }}" alt="Your profile photo" data-photo-preview>{% else %}<span class="tm-photo-empty" data-photo-preview-empty>{{ ic('user') }}</span><img class="tm-hidden" alt="Your new profile photo" data-photo-preview>{% endif %}
+        </div>
+        <b class="tm-idcard-name">{{ profile.name or 'Your name' }}</b>
+        <span class="tm-idcard-role">{{ profile.role_title or 'Your role' }}</span>
+        <span class="tm-id-chip">{{ ic('shield', 'ic-sm') }} {{ profile.team_id }}</span>
+      </div>
+
+      <div class="tm-card tm-share">
+        <span class="tm-label">Your public link</span>
+        {% if is_public %}
+          <a class="tm-share-url" href="{{ public_url }}" target="_blank" rel="noopener">{{ public_url }}</a>
+          <div class="tm-share-actions">
+            <button class="tm-btn tm-btn-sm" type="button" data-copy="{{ public_url }}">{{ ic('link', 'ic-sm') }} <span data-copy-label>Copy link</span></button>
+            <a class="tm-btn-ghost tm-btn-sm" href="{{ public_url }}" target="_blank" rel="noopener">View page {{ ic('arrow', 'ic-sm') }}</a>
+          </div>
+        {% else %}
+          <p class="tm-note">Add your name and role, then save — your public page goes live at <b>{{ public_url }}</b>.</p>
+        {% endif %}
+      </div>
+    </aside>
+
+    <form class="tm-card tm-form tm-editor" method="post" enctype="multipart/form-data" data-submit-once>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <fieldset>
+        <legend>Photo</legend>
+        <div class="tm-photo-row">
+          <label class="tm-upload">
+            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" data-photo-input>
+            {{ ic('camera', 'ic-sm') }} <span>{{ 'Change photo' if photo_url else 'Upload a photo' }}</span>
+          </label>
+          {% if photo_url %}<label class="tm-check"><input type="checkbox" name="remove_photo" value="yes"> Remove current photo</label>{% endif %}
+        </div>
+        <p class="tm-hint">JPEG, PNG or WebP up to 8 MB. It's cropped to a square, and location data is removed.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>About you</legend>
+        <label class="tm-field"><span>Full name <i>*</i></span><input name="name" value="{{ values.name }}" maxlength="120" required autocomplete="name"></label>
+        <label class="tm-field"><span>Role in the team <i>*</i></span><input name="role_title" value="{{ values.role_title }}" maxlength="120" required placeholder="e.g. VAPT Lead, Developer, Community Lead"></label>
+        <label class="tm-field"><span>Short bio</span><textarea name="bio" rows="4" maxlength="{{ bio_limit }}" placeholder="What you work on at GAMKERS">{{ values.bio }}</textarea></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Social profiles</legend>
+        <p class="tm-hint">Each link must be on that platform's own site. Leave any blank.</p>
+        <div class="tm-socials-grid">
+          {% for platform in platforms %}
+            <label class="tm-field tm-field-icon"><span>{{ ic(platform.icon, 'ic-sm') }} {{ platform.label }}</span>
+              <input name="{{ platform.key }}" value="{{ values[platform.key] }}" maxlength="300" inputmode="url" placeholder="{{ 'https://' ~ (platform.domains[0] if platform.domains else 'your-site.com') ~ '/…' }}">
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <div class="tm-editor-actions">
+        <button class="tm-btn tm-btn-inline" type="submit">{{ ic('check', 'ic-sm') }} Save profile</button>
+        <span class="tm-hint">Your email address is never shown publicly.</span>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

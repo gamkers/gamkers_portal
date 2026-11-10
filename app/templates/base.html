@@ -18,6 +18,7 @@
         <a href="{{ url_for('main.dashboard') }}" {% if request.endpoint == 'main.dashboard' %}aria-current="page"{% endif %}>Workspace</a>
         {% if current_user.has_permission('responses.view') %}<a href="{{ url_for('main.analytics') }}" {% if request.endpoint == 'main.analytics' %}aria-current="page"{% endif %}>Analytics</a>{% endif %}
         {% if current_user.has_permission('certificates.manage') %}<a href="{{ url_for('certificates.index') }}" {% if request.blueprint == 'certificates' %}aria-current="page"{% endif %}>Certificates</a>{% endif %}
+        {% if current_user.has_permission('team_profiles.manage') %}<a href="{{ url_for('team_profiles.admin_index') }}" {% if request.blueprint == 'team_profiles' %}aria-current="page"{% endif %}>Team IDs</a>{% endif %}
         {% if current_user.has_permission('bulk_mail.send') %}<a href="{{ url_for('bulk_mail.compose') }}" {% if request.blueprint == 'bulk_mail' %}aria-current="page"{% endif %}>Bulk mail</a>{% endif %}
         {% if current_user.is_org_admin %}
           <a href="{{ url_for('organization.team') }}" {% if request.endpoint == 'organization.team' %}aria-current="page"{% endif %}>Team</a>

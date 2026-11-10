@@ -16,6 +16,7 @@ ROLE_PERMISSIONS = (
     ("responses.export", "Export response data"),
     ("certificates.manage", "Generate and manage certificates"),
     ("bulk_mail.send", "Import contacts and send bulk mail"),
+    ("team_profiles.manage", "Invite and manage GAMKERS team profiles and IDs"),
     ("settings.manage", "Change workspace and email settings"),
     ("team.manage", "Invite and manage team members"),
     ("permissions.manage", "Change role permissions"),

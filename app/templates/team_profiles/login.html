@@ -1,0 +1,16 @@
+{% extends 'team_profiles/_layout.html' %}
+{% from 'team_profiles/_ic.html' import ic %}
+{% block title %}Team portal sign-in · GAMKERS{% endblock %}
+{% block content %}
+<section class="tm-auth">
+  <span class="tm-pill">{{ ic('users', 'ic-sm') }} GAMKERS team portal</span>
+  <h1>Sign in to your team profile</h1>
+  <p class="tm-lead">For GAMKERS team contributors only. Enter the email you were invited with and we'll send you a one-time sign-in link — no password needed.</p>
+  <form class="tm-card tm-form" method="post" data-submit-once>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="tm-field"><span>Team email</span><input name="email" type="email" value="{{ email }}" placeholder="you@example.com" maxlength="255" autocomplete="email" required autofocus></label>
+    <button class="tm-btn" type="submit">{{ ic('mail', 'ic-sm') }} Email me a sign-in link</button>
+  </form>
+  <p class="tm-note">Not on the team yet? Team profiles are created by GAMKERS admins by invitation.</p>
+</section>
+{% endblock %}

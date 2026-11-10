@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Team profiles · GAMKERS ADMIN{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/team-admin.css') }}">{% endblock %}
+{% block content %}
+<section class="workspace-wrap settings-wrap">
+  <div class="workspace-heading">
+    <div>
+      <p class="eyebrow">GAMKERS ADMIN <span aria-hidden="true">/</span> TEAM PROFILES</p>
+      <h1>Team profiles &amp; IDs</h1>
+      <p class="muted">Invite people who contribute to GAMKERS as part of the team. Each gets a permanent team ID and a public profile they can share as proof of membership.</p>
+    </div>
+    <a class="button button-outline" href="{{ url_for('team_profiles.login') }}" target="_blank" rel="noopener">Team portal ↗</a>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><span>ACTIVE</span><strong>{{ counts.active }}</strong><small>Signed in at least once</small></div>
+    <div class="stat-card"><span>INVITED</span><strong>{{ counts.invited }}</strong><small>Waiting to accept</small></div>
+    <div class="stat-card"><span>SUSPENDED</span><strong>{{ counts.suspended }}</strong><small>Public page shows inactive</small></div>
+  </div>
+
+  <form class="panel invite-panel tp-invite" method="post" action="{{ url_for('team_profiles.admin_invite') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <p class="eyebrow">ADD A TEAM CONTRIBUTOR</p>
+      <h2>Invite by email</h2>
+      <p class="muted">They'll get their team ID and a private link (valid 7 days) to add their photo, role and social profiles. Name and role are optional here — they can fill them in.</p>
+    </div>
+    <div class="tp-invite-grid">
+      <label><span>Email</span><input name="email" type="email" placeholder="name@example.com" maxlength="255" required></label>
+      <label><span>Name <em>(optional)</em></span><input name="name" maxlength="120" placeholder="Full name"></label>
+      <label><span>Role <em>(optional)</em></span><input name="role_title" maxlength="120" placeholder="e.g. VAPT Lead"></label>
+      <button class="button button-primary" type="submit">Send invitation ↗</button>
+    </div>
+  </form>
+
+  <div class="section-title-row">
+    <div><p class="eyebrow">THE GAMKERS TEAM</p><h2>Team profiles</h2></div>
+    <span class="form-count">{{ profiles|length }} {{ 'profile' if profiles|length == 1 else 'profiles' }}</span>
+  </div>
+
+  {% if profiles %}
+    <div class="tp-list">
+      {% for profile in profiles %}
+        {% set photo = photo_url(profile) %}
+        <article class="tp-row">
+          <div class="tp-avatar">{% if photo %}<img src="{{ photo }}" alt="">{% else %}{{ profile.display_name[:1]|upper }}{% endif %}</div>
+          <div class="tp-main">
+            <div class="tp-name">
+              <strong>{{ profile.name or 'Name not set yet' }}</strong>
+              <code class="tp-id">{{ profile.team_id }}</code>
+              {% if profile.status == 'active' %}<span class="badge badge-live">Active</span>
+              {% elif profile.status == 'invited' %}<span class="badge badge-draft">Invited</span>
+              {% else %}<span class="badge tp-badge-off">Suspended</span>{% endif %}
+            </div>
+            <p class="tp-meta">{{ profile.role_title or 'Role not set yet' }} · {{ profile.email }}</p>
+            <p class="tp-meta">
+              {% if profile.joined_at %}Joined {{ profile.joined_at.strftime('%b %d, %Y') }}{% else %}Invited {{ profile.created_at.strftime('%b %d, %Y') }}{% endif %}
+              {% if profile.status == 'active' and not is_public(profile) %} · <span class="tp-warn">Profile not completed — public page hidden</span>{% endif %}
+            </p>
+          </div>
+          <div class="tp-actions">
+            {% if is_public(profile) %}<a class="button button-quiet button-small" href="{{ url_for('team_profiles.public_profile', team_id=profile.team_id) }}" target="_blank" rel="noopener">View page ↗</a>{% endif %}
+            {% if profile.status == 'invited' %}
+              <form method="post" action="{{ url_for('team_profiles.admin_resend', profile_id=profile.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="button button-outline button-small" type="submit">Resend invite</button></form>
+            {% endif %}
+            <details class="tp-more">
+              <summary class="button button-quiet button-small">Manage</summary>
+              <div class="tp-more-panel">
+                <form class="tp-edit" method="post" action="{{ url_for('team_profiles.admin_update', profile_id=profile.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <label><span>Name</span><input name="name" maxlength="120" value="{{ profile.name }}"></label>
+                  <label><span>Role</span><input name="role_title" maxlength="120" value="{{ profile.role_title }}"></label>
+                  <button class="button button-outline button-small" type="submit">Save</button>
+                </form>
+                <div class="tp-danger">
+                  <form method="post" action="{{ url_for('team_profiles.admin_status', profile_id=profile.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if profile.status == 'suspended' %}
+                      <input type="hidden" name="action" value="reactivate"><button class="button button-outline button-small" type="submit">Reactivate ID</button>
+                    {% else %}
+                      <input type="hidden" name="action" value="suspend"><button class="button button-outline button-small" type="submit">Suspend ID</button>
+                    {% endif %}
+                  </form>
+                  <details class="tp-confirm">
+                    <summary class="button button-quiet button-small tp-delete">Delete…</summary>
+                    <form method="post" action="{{ url_for('team_profiles.admin_delete', profile_id=profile.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <p>Permanently delete {{ profile.team_id }} and its photo? The public link stops working. Suspend instead if they might return.</p>
+                      <button class="button button-small tp-delete-confirm" type="submit">Delete permanently</button>
+                    </form>
+                  </details>
+                </div>
+              </div>
+            </details>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-mark" aria-hidden="true">＋</div>
+      <h3>No team profiles yet</h3>
+      <p>Invite your first team contributor above. They'll get a team ID like GMK-0001.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

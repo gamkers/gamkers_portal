@@ -3,6 +3,7 @@ from app.certificates.models import CertificateBatch, CertificateRecord, Certifi
 from app.extensions import db, login_manager
 from app.forms.models import Form, Submission
 from app.organization.models import Organization
+from app.team_profiles.models import TeamProfile, TeamProfileToken
 from app.utils import utcnow
 
 
@@ -24,6 +25,8 @@ __all__ = [
     "PasswordReset",
     "RolePermission",
     "Submission",
+    "TeamProfile",
+    "TeamProfileToken",
     "User",
     "utcnow",
 ]

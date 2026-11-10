@@ -1,0 +1,11 @@
+{% extends 'team_profiles/_layout.html' %}
+{% from 'team_profiles/_ic.html' import ic %}
+{% block title %}Check your inbox · GAMKERS Team{% endblock %}
+{% block content %}
+<section class="tm-auth">
+  <div class="tm-auth-icon">{{ ic('mail') }}</div>
+  <h1>Check your inbox</h1>
+  <p class="tm-lead">If <b>{{ email }}</b> belongs to a GAMKERS team member, a sign-in link is on its way. It works once and expires in 20 minutes.</p>
+  <p class="tm-note">Nothing arrived? Check spam, or <a href="{{ url_for('team_profiles.login') }}">try again</a>.</p>
+</section>
+{% endblock %}

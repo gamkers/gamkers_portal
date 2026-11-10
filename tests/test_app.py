@@ -269,7 +269,7 @@ def test_admin_can_change_role_permissions_without_granting_admin_privilege(
         user_id = user.id
 
     response = client.post(
-        "/team/permissions",
+        "/settings/team/permissions",
         data={
             "developer:bulk_mail.send": "on",
             "admin:team.manage": "off",
@@ -299,7 +299,7 @@ def test_admin_can_change_role_permissions_without_granting_admin_privilege(
         assert not db.session.get(User, user_id).has_permission("bulk_mail.send")
 
     response = client.post(
-        f"/team/{user_id}/role",
+        f"/settings/team/{user_id}/role",
         data={"role": "admin"},
         follow_redirects=True,
     )

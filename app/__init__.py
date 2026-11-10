@@ -56,6 +56,7 @@ def create_app(test_config=None):
         "CERTIFICATE_STORAGE_PATH": "var/certificates",
         "CERTIFICATE_UPLOAD_PATH": "var/uploads/certificates",
         "FORM_BANNER_STORAGE_PATH": "var/uploads/form-banners",
+        "TEAM_PHOTO_STORAGE_PATH": "var/uploads/team-photos",
     }
     for setting, default in storage_paths.items():
         path = Path(app.config.get(setting) or default)
@@ -93,6 +94,7 @@ def create_app(test_config=None):
     from app.organization.routes import organization
     from app.certificates.routes import certificates
     from app.bulk_mail import bulk_mail
+    from app.team_profiles.routes import team_profiles
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
@@ -100,6 +102,7 @@ def create_app(test_config=None):
     app.register_blueprint(organization)
     app.register_blueprint(certificates)
     app.register_blueprint(bulk_mail)
+    app.register_blueprint(team_profiles)
 
     @app.url_defaults
     def version_static_urls(endpoint, values):

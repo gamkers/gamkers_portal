@@ -1,0 +1,40 @@
+{% from 'team_profiles/_ic.html' import ic %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070907">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <title>{% block title %}GAMKERS Team{% endblock %}</title>
+  {% block meta %}<meta name="robots" content="noindex">{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/team.css') }}">
+  <script src="{{ url_for('static', filename='js/team.js') }}" defer></script>
+</head>
+<body class="tm-body">
+{% include 'community/_icons.html' %}
+<nav class="c-nav scrolled">
+  <div class="c-nav-inner">
+    <a class="c-brand" href="{{ url_for('main.home') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Gamkers"> <span>GAMKERS</span></a>
+    <div class="tm-nav-right">
+      {% block nav_right %}<a class="tm-nav-link" href="{{ url_for('team_profiles.lookup') }}">{{ ic('shield', 'ic-sm') }} Verify a team ID</a>{% endblock %}
+    </div>
+  </div>
+</nav>
+<main class="tm-page">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="tm-flashes" aria-live="polite">
+        {% for category, message in messages %}<div class="tm-flash tm-flash-{{ category }}">{{ message }}</div>{% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="tm-footer">
+  <span>© {{ current_year }} GAMKERS · India's Largest Growing Cyber Security Community</span>
+  <a href="{{ url_for('team_profiles.login') }}">Team portal</a>
+</footer>
+</body>
+</html>

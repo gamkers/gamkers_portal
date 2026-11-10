@@ -162,7 +162,7 @@ class FormsGamkersTestCase(unittest.TestCase):
         self.test_02_signup_and_workspace_creation()
 
         with patch("app.organization.routes.send_email", return_value=True):
-            res = self.client.post("/team", data={"email": "teammate@gamkers.in", "role": "developer"}, follow_redirects=True)
+            res = self.client.post("/settings/team", data={"email": "teammate@gamkers.in", "role": "developer"}, follow_redirects=True)
             self.assertEqual(res.status_code, 200)
 
         invite = Invitation.query.filter_by(email="teammate@gamkers.in").first()
