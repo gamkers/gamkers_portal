@@ -94,6 +94,7 @@ class FormsGamkersTestCase(unittest.TestCase):
         self.assertEqual(res.headers.get("X-Content-Type-Options"), "nosniff")
         self.assertEqual(res.headers.get("X-Frame-Options"), "DENY")
         self.assertIn("Content-Security-Policy", res.headers)
+        self.assertIn("camera=()", res.headers.get("Permissions-Policy", ""))
 
     def test_02_signup_and_workspace_creation(self):
         """Public signup stays disabled; the CLI provisions the single admin."""

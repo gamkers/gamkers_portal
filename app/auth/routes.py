@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy import func
 
@@ -15,7 +15,6 @@ auth = Blueprint("auth", __name__)
 
 
 @auth.route("/login", methods=["GET", "POST"])
-@auth.route("/admin/login", methods=["GET", "POST"])  # registered first: url_for() builds this one
 @limiter.limit("10 per minute")
 def login():
     if current_user.is_authenticated:
@@ -35,14 +34,26 @@ def login():
 
 
 @auth.post("/logout")
-@login_required
 def logout():
+    # Idempotent: always clears the session and cookies, even if already signed out.
     logout_user()
-    return redirect(url_for("main.home"))
+    session.clear()
+    response = redirect(url_for("main.home"))
+    response.delete_cookie(current_app.config.get("SESSION_COOKIE_NAME", "session"))
+    response.delete_cookie(current_app.config.get("REMEMBER_COOKIE_NAME", "remember_token"))
+    return response
+
+
+def _password_reset_email_key():
+    # Hashed so the limiter storage never holds raw addresses. The limit applies
+    # whether or not the account exists, so a 429 reveals nothing about accounts.
+    email = request.form.get("email", "").strip().lower()
+    return "forgot-password:" + hash_token(email)
 
 
 @auth.route("/forgot-password", methods=["GET", "POST"])
 @limiter.limit("5 per hour")
+@limiter.limit("3 per hour", key_func=_password_reset_email_key, methods=["POST"])
 def forgot_password():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()

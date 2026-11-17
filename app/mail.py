@@ -227,7 +227,7 @@ def _styled_email(
     event_url=None,
     calendar_url=None,
 ):
-    settings = hostinger_settings() or smtp_settings(organization)
+    settings = smtp_settings(organization) or hostinger_settings()
     if not settings:
         return None, None, None
     safe_html = _sanitize_email_html(body, content_format)
@@ -409,43 +409,8 @@ def smtp_settings(organization=None):
     return None
 
 
-def send_email(
-    recipient,
-    subject,
-    body,
-    organization=None,
-    content_format="text",
-    event_details=None,
-    event_title=None,
-    event_url=None,
-    calendar_event=None,
-):
-    calendar_url = _calendar_url(calendar_event) if calendar_event else None
-    message, settings, context = _styled_email(
-        recipient,
-        subject,
-        body,
-        organization,
-        content_format,
-        event_details=event_details,
-        event_title=event_title,
-        event_url=event_url,
-        calendar_url=calendar_url,
-    )
-    if not settings:
-        return False
-    if calendar_event:
-        message.add_attachment(
-            _calendar_invite(calendar_event).encode("utf-8"),
-            maintype="text",
-            subtype="calendar",
-            params={"method": "PUBLISH", "charset": "UTF-8"},
-            filename="event.ics",
-        )
-    if settings.get("transport") == "hostinger":
-        return _send_via_hostinger(
-            message, recipient, settings, _plain_text_body(body, content_format)
-        )
+def _send_via_smtp(message, settings, context):
+    """Deliver an EmailMessage through the configured SMTP server."""
     if settings["security"] not in {"starttls", "ssl"}:
         raise ValueError("SMTP must use STARTTLS or SSL/TLS.")
     addresses = socket.getaddrinfo(
@@ -460,12 +425,13 @@ def send_email(
             public_addresses.append(ip)
     if not public_addresses:
         raise OSError("SMTP host did not resolve to an address.")
+
+    # Connect to the checked IP while retaining the configured host for TLS verification.
     server_host = str(public_addresses[0])
     if settings["security"] == "ssl":
         server = smtplib.SMTP_SSL(timeout=15, context=context)
     else:
         server = smtplib.SMTP(timeout=15)
-    # Connect to the checked IP while retaining the configured host for TLS verification.
     server._host = settings["host"]
     server.connect(server_host, settings["port"])
     with server:
@@ -477,3 +443,83 @@ def send_email(
             server.login(settings["username"], settings["password"] or "")
         server.send_message(message)
     return True
+
+
+def send_email(
+    recipient,
+    subject,
+    body,
+    organization=None,
+    content_format="text",
+    event_details=None,
+    event_title=None,
+    event_url=None,
+    calendar_event=None,
+):
+    calendar_url = _calendar_url(calendar_event) if calendar_event else None
+
+    # SMTP is the primary transport. Hostinger is considered only when SMTP is
+    # not configured, or after an actual SMTP delivery attempt fails.
+    smtp = smtp_settings(organization)
+    hostinger = hostinger_settings()
+    primary_settings = smtp or hostinger
+    if not primary_settings:
+        return False
+
+    message, _, context = _styled_email(
+        recipient,
+        subject,
+        body,
+        organization,
+        content_format,
+        event_details=event_details,
+        event_title=event_title,
+        event_url=event_url,
+        calendar_url=calendar_url,
+    )
+    if not message:
+        return False
+
+    if calendar_event:
+        message.add_attachment(
+            _calendar_invite(calendar_event).encode("utf-8"),
+            maintype="text",
+            subtype="calendar",
+            params={"method": "PUBLISH", "charset": "UTF-8"},
+            filename="event.ics",
+        )
+
+    if smtp:
+        try:
+            _send_via_smtp(message, smtp, context)
+            return True
+        except Exception as smtp_error:
+            # Do not call the Hostinger API unless SMTP failed and a token is
+            # configured. The API request itself verifies that the credentials
+            # are accepted before attempting to send.
+            if not hostinger:
+                raise
+            current_app.logger.warning(
+                "SMTP email delivery failed; attempting Hostinger Mail API fallback: %s",
+                smtp_error,
+            )
+            try:
+                return _send_via_hostinger(
+                    message,
+                    recipient,
+                    hostinger,
+                    _plain_text_body(body, content_format),
+                )
+            except Exception as hostinger_error:
+                raise RuntimeError(
+                    "Email delivery failed through both SMTP and Hostinger Mail API. "
+                    f"SMTP error: {smtp_error}; Hostinger error: {hostinger_error}"
+                ) from hostinger_error
+
+    # No SMTP configuration: use Hostinger as the only configured transport.
+    return _send_via_hostinger(
+        message,
+        recipient,
+        hostinger,
+        _plain_text_body(body, content_format),
+    )

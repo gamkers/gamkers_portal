@@ -4,6 +4,8 @@ import socket
 from datetime import timedelta
 from types import SimpleNamespace
 
+import pytest
+
 from app.extensions import db
 from app.models import Form, Organization, PasswordReset, RolePermission, User, utcnow
 from app.security import hash_token
@@ -306,3 +308,163 @@ def test_admin_can_change_role_permissions_without_granting_admin_privilege(
     assert b"Choose the developer or contributor role" in response.data
     with app.app_context():
         assert db.session.get(User, user_id).role == "contributor"
+
+def test_hsts_present_on_csrf_failure(app):
+    app.config["WTF_CSRF_ENABLED"] = True
+    client = app.test_client()
+    response = client.post("/login", data={})  # unga login URL ah podunga
+    assert response.status_code == 400
+    assert response.headers["Strict-Transport-Security"] == "max-age=31536000; includeSubDomains"
+
+
+DENIED_BROWSER_FEATURES = {
+    "camera",
+    "microphone",
+    "geolocation",
+    "payment",
+    "usb",
+    "accelerometer",
+    "gyroscope",
+}
+
+
+def _permissions_policy(response):
+    header = response.headers["Permissions-Policy"]
+    return dict(directive.strip().split("=", 1) for directive in header.split(","))
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["/", "/login", "/dashboard", "/does-not-exist", "/static/css/app.css"],
+)
+def test_permissions_policy_denies_unused_device_apis_on_every_response(client, path):
+    response = client.get(path)
+    policy = _permissions_policy(response)
+    assert set(policy) == DENIED_BROWSER_FEATURES
+    assert set(policy.values()) == {"()"}
+
+
+def test_permissions_policy_does_not_block_features_the_app_uses(client):
+    # app.js, team.js and community.js rely on the Clipboard and Web Share APIs.
+    policy = _permissions_policy(client.get("/"))
+    assert "clipboard-write" not in policy
+    assert "web-share" not in policy
+
+
+def test_permissions_policy_present_on_csrf_failure(app):
+    app.config["WTF_CSRF_ENABLED"] = True
+    response = app.test_client().post("/login", data={})
+    assert response.status_code == 400
+    assert set(_permissions_policy(response)) == DENIED_BROWSER_FEATURES
+
+
+@pytest.mark.parametrize(
+    ("value", "expected_env", "expected_secure"),
+    [
+        (None, "production", True),
+        ("production", "production", True),
+        (" Production ", "production", True),
+        ("development", "development", False),
+        ("DEVELOPMENT", "development", False),
+    ],
+)
+def test_app_env_selects_environment_settings(
+    monkeypatch, tmp_path, value, expected_env, expected_secure
+):
+    from app import create_app
+
+    if value is None:
+        monkeypatch.delenv("APP_ENV", raising=False)
+    else:
+        monkeypatch.setenv("APP_ENV", value)
+    app = create_app(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "test-key-not-for-production",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            "CERTIFICATE_STORAGE_PATH": str(tmp_path / "certificates"),
+            "CERTIFICATE_UPLOAD_PATH": str(tmp_path / "certificate-uploads"),
+            "FORM_BANNER_STORAGE_PATH": str(tmp_path / "form-banners"),
+        }
+    )
+    assert app.config["APP_ENV"] == expected_env
+    assert app.config["SESSION_COOKIE_SECURE"] is expected_secure
+    assert app.config["REMEMBER_COOKIE_SECURE"] is expected_secure
+
+
+@pytest.mark.parametrize("value", ["staging", "prod", "", "1"])
+def test_unknown_app_env_is_rejected(monkeypatch, value):
+    from config import get_config
+
+    monkeypatch.setenv("APP_ENV", value)
+    with pytest.raises(RuntimeError, match="APP_ENV"):
+        get_config()
+
+
+def test_logout_survives_expired_csrf_token_and_signed_out_state(app):
+    app.config["WTF_CSRF_ENABLED"] = True
+    client = app.test_client()
+    with client.session_transaction() as session:
+        session["leftover"] = "x"
+    response = client.post("/logout")  # no/expired CSRF token
+    assert response.status_code == 302
+    with client.session_transaction() as session:
+        assert "leftover" not in session
+    assert client.get("/logout").status_code == 405
+
+
+def test_forgot_password_is_limited_per_email_address(tmp_path):
+    # The shared `app` fixture disables the limiter (Flask-Limiter then never sets up
+    # its storage), so build an app with rate limiting on and restore the limiter after.
+    from app import create_app
+    from app.extensions import limiter
+
+    limited_app = create_app(
+        {
+            "TESTING": True,
+            "SECRET_KEY": "test-key-not-for-production",
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            "CERTIFICATE_STORAGE_PATH": str(tmp_path / "certificates"),
+            "CERTIFICATE_UPLOAD_PATH": str(tmp_path / "certificate-uploads"),
+            "FORM_BANNER_STORAGE_PATH": str(tmp_path / "form-banners"),
+            "TEAM_PHOTO_STORAGE_PATH": str(tmp_path / "team-photos"),
+            "SESSION_COOKIE_SECURE": False,
+            "REMEMBER_COOKIE_SECURE": False,
+            "WTF_CSRF_ENABLED": False,
+            "RATELIMIT_ENABLED": True,
+            "RATELIMIT_STORAGE_URI": "memory://",
+        }
+    )
+    try:
+        with limited_app.app_context():
+            db.create_all()
+            client = limited_app.test_client()
+            for _ in range(3):
+                response = client.post("/forgot-password", data={"email": "target@example.com"})
+                assert response.status_code == 302
+            # A different address is unaffected by the first address's limit.
+            response = client.post("/forgot-password", data={"email": "other@example.com"})
+            assert response.status_code == 302
+            # The fourth request for the same address is refused, whatever the case or spacing.
+            response = client.post("/forgot-password", data={"email": " Target@Example.com "})
+            assert response.status_code == 429
+            db.session.remove()
+            db.drop_all()
+    finally:
+        limiter.reset()
+        limiter.enabled = False
+
+
+def test_short_secret_key_logs_a_production_warning(app, caplog):
+    from app import _warn_about_weak_production_settings
+
+    app.config["SECRET_KEY"] = "too-short"
+    with caplog.at_level("WARNING"):
+        _warn_about_weak_production_settings(app)
+    assert "SECRET_KEY should be at least 32 random bytes" in caplog.text
+
+    caplog.clear()
+    app.config["SECRET_KEY"] = "k" * 32
+    with caplog.at_level("WARNING"):
+        _warn_about_weak_production_settings(app)
+    assert "SECRET_KEY" not in caplog.text

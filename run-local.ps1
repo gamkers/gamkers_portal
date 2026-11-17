@@ -1,6 +1,8 @@
 # Local development: starts the bundled MariaDB (var/) and the Flask dev server.
 # Usage:  .\run-local.ps1
 $root = $PSScriptRoot
+# Local dev runs over plain HTTP, so allow non-Secure session cookies (production is the default).
+if (-not $env:APP_ENV) { $env:APP_ENV = "development" }
 $mariadb = Join-Path $root "var\mariadb\bin\mariadbd.exe"
 $dataDir = Join-Path $root "var\mysql-data"
 

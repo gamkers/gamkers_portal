@@ -393,22 +393,22 @@ def public_certificate(token):
 @certificates.get("/verify")
 @limiter.limit("30 per minute")
 def verify_certificate():
-    certificate_number = request.args.get("number", "").strip()
+    token = request.args.get("token", "").strip()
     certificate = None
     batch = None
-    if certificate_number and len(certificate_number) <= 48:
+    if token and len(token) <= 64:
         certificate = CertificateRecord.query.filter_by(
-            certificate_number=certificate_number,
+            public_token=token,
             status="generated",
         ).first()
         if certificate:
             batch = db.session.get(CertificateBatch, certificate.batch_id)
     return render_template(
         "certificates/verify.html",
-        certificate_number=certificate_number,
+        token=token,
         certificate=certificate,
         batch=batch,
-        searched=bool(certificate_number),
+        searched=bool(token),
     )
 
 

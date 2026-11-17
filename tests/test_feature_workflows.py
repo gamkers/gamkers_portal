@@ -127,14 +127,52 @@ def test_wsgi_entrypoints_start_the_flask_application(monkeypatch):
         created_apps.append(app)
         return app
 
+    # wsgi.py only starts the development server when APP_ENV=development.
+    monkeypatch.setenv("APP_ENV", "development")
     monkeypatch.setattr(app_package, "create_app", create_test_app)
-    monkeypatch.setattr(Flask, "run", lambda application: started_apps.append(application))
+    monkeypatch.setattr(
+        Flask,
+        "run",
+        lambda application, **options: started_apps.append((application, options)),
+    )
 
     runpy.run_path("wsgi.py", run_name="__main__")
     runpy.run_path("passenger_wsgi.py", run_name="__main__")
 
     assert len(created_apps) == 2
-    assert started_apps == created_apps
+    assert [started for started, _options in started_apps] == created_apps
+    assert started_apps[0][1] == {"host": "127.0.0.1", "port": 18080, "debug": True}
+    assert started_apps[1][1] == {}
+
+
+def test_wsgi_refuses_to_start_the_development_server_in_production(monkeypatch):
+    import runpy
+
+    import app as app_package
+    from flask import Flask
+
+    original_create_app = app_package.create_app
+    started_apps = []
+
+    def create_test_app():
+        return original_create_app(
+            {
+                "TESTING": True,
+                "SECRET_KEY": "wsgi-smoke-test",
+                "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            }
+        )
+
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setattr(app_package, "create_app", create_test_app)
+    monkeypatch.setattr(
+        Flask, "run", lambda application, **options: started_apps.append(application)
+    )
+
+    with pytest.raises(RuntimeError, match="production WSGI server"):
+        runpy.run_path("wsgi.py", run_name="__main__")
+
+    assert started_apps == []
 
 
 def test_published_forms_save_changes_without_republishing_or_unpublishing(client):
@@ -341,6 +379,8 @@ def test_closing_registration_creates_feedback_form_and_generates_permanent_cert
     assert public_pdf.data.startswith(b"%PDF")
     assert public_pdf.headers["X-Frame-Options"] == "SAMEORIGIN"
     assert "frame-ancestors 'self'" in public_pdf.headers["Content-Security-Policy"]
+    # The route overrides framing headers but must still carry the global policy.
+    assert "camera=()" in public_pdf.headers["Permissions-Policy"]
     downloaded_pdf = client.get(
         f"/certificates/public/{certificate.public_token}/download"
     )
@@ -350,7 +390,7 @@ def test_closing_registration_creates_feedback_form_and_generates_permanent_cert
     downloaded_pdf.close()
 
     verified = client.get(
-        f"/certificates/verify?number={certificate.certificate_number}"
+        f"/certificates/verify?token={certificate.public_token}"
     )
     assert b"AUTHENTIC CERTIFICATE" in verified.data
     assert b"Alex Attendee" in verified.data
@@ -365,10 +405,10 @@ def test_closing_registration_creates_feedback_form_and_generates_permanent_cert
     assert not pdf_path.exists()
     assert certificate.pdf_deleted_at is not None
     assert client.get(
-        f"/certificates/verify?number={certificate.certificate_number}"
+        f"/certificates/verify?token={certificate.public_token}"
     ).status_code == 200
     assert b"Alex Attendee" in client.get(
-        f"/certificates/verify?number={certificate.certificate_number}"
+        f"/certificates/verify?token={certificate.public_token}"
     ).data
     assert client.get(
         f"/certificates/public/{certificate.public_token}/pdf"
@@ -387,11 +427,14 @@ def test_admin_entry_point_requires_sign_in_and_opens_workspace(client):
     response = client.get("/admin")
     assert response.status_code == 302
     location = urlparse(response.headers["Location"])
-    assert location.path == "/admin/login"
+    assert location.path == "/login"
     assert parse_qs(location.query) == {"next": ["/dashboard"]}
 
-    login_page = client.get("/admin/login")
+    login_page = client.get("/login")
     assert login_page.status_code == 200 and b'type="password"' in login_page.data
+    # /login is the only sign-in page; the old /admin/login URL no longer exists.
+    assert client.get("/admin/login").status_code == 404
+    assert client.post("/admin/login", data={}).status_code == 404
 
     _register(client)  # creates the admin and signs in
     response = client.get("/admin")

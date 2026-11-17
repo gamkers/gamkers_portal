@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 import secrets
+import string
 
 from reportlab.lib.colors import HexColor
 from reportlab.pdfbase import pdfmetrics
@@ -55,9 +56,12 @@ def render_description(description, name, college_name, certificate_number, date
     return description
 
 
-def generate_certificate_number(certificate_id):
+def generate_certificate_number():
+    """Return a non-sequential, human-readable public certificate number."""
     year = datetime.now(timezone.utc).year
-    return f"CERT-{year}-{certificate_id:06d}"
+    alphabet = string.ascii_uppercase + string.digits
+    random_code = "".join(secrets.choice(alphabet) for _ in range(8))
+    return f"CERT-{year}-{random_code}"
 
 
 def generate_public_token():

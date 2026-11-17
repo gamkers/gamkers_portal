@@ -23,10 +23,10 @@
   <div class="cert-wrap narrow">
     <span class="ev-status up">{{ ic('shield', 'ic-sm') }} Public records</span>
     <h1 class="ev-title">Verify a certificate</h1>
-    <p class="cert-lead">Enter the certificate number printed on a GAMKERS certificate to confirm it is genuine. Verification stays available even after the PDF is removed.</p>
+    <p class="cert-lead">Enter the secure verification code from your GAMKERS certificate link to confirm it is genuine. Verification stays available even after the PDF is removed.</p>
     <form class="cert-search" method="get" action="{{ url_for('certificates.verify_certificate') }}">
-      <label class="sr-only" for="certificate-number">Certificate number</label>
-      <input id="certificate-number" name="number" maxlength="48" required value="{{ certificate_number }}" placeholder="CERT-2026-000001">
+      <label class="sr-only" for="certificate-token">Verification code</label>
+      <input id="certificate-token" name="token" maxlength="64" required value="{{ token }}" placeholder="Paste the secure verification code">
       <button class="ev-register" type="submit">{{ ic('search') }} Verify</button>
     </form>
 
@@ -44,7 +44,7 @@
     {% elif searched %}
       <div class="cert-result invalid" role="status">
         <div class="cert-result-head">{{ ic('plus', 'x') }}<div><p>NOT FOUND</p><h2>No matching certificate</h2></div></div>
-        <p class="cert-lead">Check the certificate number and try again. No certificate record was found.</p>
+        <p class="cert-lead">Check the verification code and try again. No certificate record was found.</p>
       </div>
     {% endif %}
   </div>
